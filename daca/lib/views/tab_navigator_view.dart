@@ -1,38 +1,21 @@
 import 'package:flutter/material.dart';
-// import 'package:yuyu/page/homepage.dart';
-// import 'package:yuyu/page/my_map.dart';
-// import 'package:yuyu/page/account.dart';
-// import 'package:yuyu/page/book_movie_collecction.dart';
-// import 'package:yuyu/page/loginpage.dart';
+import 'package:daca/views/homepage.dart';
+import 'package:daca/views/account.dart';
+import 'package:daca/views/book_movie_collecction.dart';
+import 'package:daca/views/travel_map_view.dart';
+import 'package:daca/public/strings.dart';
 
-void main() {
-  runApp(TabNavigator());
-}
+class TabNavigatorView extends StatelessWidget {
+  static String tag = 'tabNavigatorView';
 
-class TabNavigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: true,
-        // routes: {
-        //   '/screen1': (context) => new Screen1(),},
-        home: Scaffold(
-          // appBar: AppBar(
-          //   title: Text("Cathy App"),
-          // )
-          // body: XD_Screen1(),
-          body: BottomController(),
-          // HomePage(),
-          //   floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-          //   floatingActionButton: FloatingActionButton(
-          //     child: Icon(Icons.add),
-          //     elevation: 10,
-          //     backgroundColor: Color.fromARGB(255, 216, 226, 248),
-          //     onPressed: () {
-          //       print('press...');
-          //     },
-          // ),
-        ));
+      debugShowCheckedModeBanner: true,
+      home: Scaffold(
+        body: TabController(),
+      ),
+    );
   }
 }
 
@@ -43,7 +26,12 @@ class TabController extends StatefulWidget {
 
 class _TabControllerState extends State<TabController> {
   int _currentIndex = 0;
-  final pages = [HomePage(), MyMap(), Collection(), Account(), LoginPage()];
+  final pages = [
+    HomePage(),
+    TravelMapView(),
+    Collection(),
+    Account(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -60,18 +48,21 @@ class _TabControllerState extends State<TabController> {
       body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
-          // ignore: deprecated_member_use
           BottomNavigationBarItem(
-              icon: Icon(Icons.menu_book), title: Text('magazine')),
+            icon: Icon(Icons.menu_book),
+            title: Text('magazine'),
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.where_to_vote_sharp), title: Text('my map')),
+            icon: Icon(Icons.where_to_vote_sharp),
+            title: Text(DaCaStrings.tabMapText),
+          ),
           BottomNavigationBarItem(
               icon: Icon(Icons.movie_creation_outlined),
               title: Text('collection')),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle_sharp), title: Text('account')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.vpn_key), title: Text('Login'))
+            icon: Icon(Icons.account_circle_sharp),
+            title: Text('account'),
+          ),
         ],
         currentIndex: _currentIndex,
         backgroundColor: Colors.black12,

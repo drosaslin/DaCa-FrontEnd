@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:daca/strings.dart';
+import 'package:daca/public/strings.dart';
 import 'package:daca/colors.dart';
 import 'package:daca/viewmodels/login_view_model.dart';
 
@@ -78,8 +78,8 @@ class LoginButtonContent extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            onPressed: () {
-              this.viewModel.onLogin(context);
+            onPressed: () async {
+              await this.viewModel.onLogin(context);
             },
           ),
         ),

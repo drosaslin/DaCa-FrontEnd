@@ -1,7 +1,14 @@
 import 'package:daca/views/sign_up_view.dart';
+import 'package:daca/models/user.dart';
+import 'package:daca/views/tab_navigator_view.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:daca/repositories/user_repository.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:daca/public/exceptions.dart';
 
 class LoginViewModel {
+  final UserRepository repository = UserRepository();
+  User userModel;
   String userId;
   String password;
 
@@ -15,12 +22,19 @@ class LoginViewModel {
     this.password = password;
   }
 
-  void onLogin(BuildContext context) {
-    print('logging in');
+  Future<void> onLogin(BuildContext context) async {
+    try {
+      this.userModel =
+          await this.repository.getByIdAndPassword(this.userId, this.password);
+      Navigator.of(context).pushNamed(TabNavigatorView.tag);
+    } on InvalidCredentialsException catch (err) {
+      Fluttertoast.showToast(msg: err.message);
+    }
   }
 
   void onSignUp(BuildContext context) {
-    Navigator.of(context).pushNamed(SignUpView.tag);
+    Navigator.of(context).pushNamedAndRemoveUntil(
+        SignUpView.tag, (Route<dynamic> route) => false);
   }
 
   void onGoogleLogin() {
