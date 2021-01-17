@@ -52,13 +52,12 @@ class TravelMapViewModel with ChangeNotifier {
    * -at least one chip is false and updating the view
   */
   void onChipStateChange() {
-    bool state = (this.foodChipState &&
+    this.allChipState = (this.foodChipState &&
         this.travelChipState &&
         this.lifeChipState &&
         this.friendChipState);
 
-    this.allChipState = !state ? false : true;
-    this.notifyListeners();
+    notifyListeners();
   }
 
   void setChipStates(bool state) {
@@ -73,7 +72,8 @@ class TravelMapViewModel with ChangeNotifier {
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((value) => {
               this.currentPosition = value,
-              updateMapPosition(controller, this.currentPosition),
+              notifyListeners(),
+              // updateMapPosition(controller, this.currentPosition),
             })
         .catchError((err) => {
               print(err),
