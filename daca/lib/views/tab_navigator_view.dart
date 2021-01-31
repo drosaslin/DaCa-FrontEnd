@@ -1,81 +1,133 @@
+import 'package:daca/public/colors.dart';
+import 'package:daca/viewmodels/tab_navigator_view_model.dart';
+import 'package:daca/views/map_search_view.dart';
 import 'package:flutter/material.dart';
-import 'package:daca/views/homepage.dart';
-import 'package:daca/views/account.dart';
-import 'package:daca/views/book_movie_collecction.dart';
-import 'package:daca/views/travel_map_view.dart';
+import 'package:provider/provider.dart';
 import 'package:daca/public/strings.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class TabNavigatorView extends StatelessWidget {
   static String tag = 'tabNavigatorView';
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: true,
-      home: Scaffold(
-        body: TabController(),
-      ),
+    return ChangeNotifierProvider<TabNavigatorViewModel>(
+      create: (context) => TabNavigatorViewModel(),
+      child: TabController(),
     );
   }
 }
 
-class TabController extends StatefulWidget {
-  @override
-  _TabControllerState createState() => _TabControllerState();
-}
-
-class _TabControllerState extends State<TabController> {
-  int _currentIndex = 0;
-  final pages = [
-    HomePage(),
-    TravelMapView(),
-    Collection(),
-    Account(),
-  ];
-
+class TabController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<TabNavigatorViewModel>(context);
+
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.0),
-              child: Icon(Icons.chat_outlined)),
-        ],
-        backgroundColor: Colors.amber,
-        title: Text('DaCa'),
+        title: Text(DaCaStrings.appTitle),
+        backgroundColor: DaCaColors.primaryColor,
       ),
-      body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            title: Text('magazine'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.where_to_vote_sharp),
-            title: Text(DaCaStrings.tabMapText),
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.movie_creation_outlined),
-              title: Text('collection')),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle_sharp),
-            title: Text('account'),
-          ),
-        ],
-        currentIndex: _currentIndex,
-        backgroundColor: Colors.black12,
-        fixedColor: Colors.amber,
-        onTap: _onTtemClick,
-        unselectedItemColor: Colors.black12,
+      body: viewModel.currentView,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        backgroundColor: DaCaColors.primaryColor,
+        onPressed: () => Navigator.of(context).pushNamed(MapSearchView.tag),
       ),
+      bottomNavigationBar: TabItemsWidget(),
     );
   }
+}
 
-  void _onTtemClick(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+class CustomFAB extends StatefulWidget {
+  @override
+  _CustomFABState createState() => _CustomFABState();
+}
+
+class _CustomFABState extends State<CustomFAB> with TickerProviderStateMixin {
+  @override
+  Widget build(BuildContext context) {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22.0),
+      // child: Icon(Icons.add),
+      onOpen: () => print('OPENING DIAL'),
+      onClose: () => print('DIAL CLOSED'),
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        SpeedDialChild(
+          child: Icon(Icons.accessibility, color: Colors.white),
+          backgroundColor: Colors.deepOrange,
+          onTap: () => print('FIRST CHILD'),
+          label: 'First Child',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.deepOrangeAccent,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.brush, color: Colors.white),
+          backgroundColor: Colors.green,
+          onTap: () => print('SECOND CHILD'),
+          label: 'Second Child',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.green,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.keyboard_voice, color: Colors.white),
+          backgroundColor: Colors.blue,
+          onTap: () => print('THIRD CHILD'),
+          labelWidget: Container(
+            color: Colors.blue,
+            margin: EdgeInsets.only(right: 10),
+            padding: EdgeInsets.all(6),
+            child: Text('Custom Label Widget'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class TabItemsWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = Provider.of<TabNavigatorViewModel>(context);
+
+    return Consumer<TabNavigatorViewModel>(
+      builder: (BuildContext context, value, Widget child) => BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        notchMargin: 10,
+        child: Container(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                color: viewModel.magazineIconColor,
+                icon: Icon(Icons.menu_book),
+                onPressed: () => viewModel.onMagazineIconPress(),
+              ),
+              IconButton(
+                color: viewModel.travelIconColor,
+                icon: Icon(Icons.where_to_vote_sharp),
+                onPressed: () => viewModel.onTravelIconPress(),
+              ),
+              SizedBox.shrink(),
+              IconButton(
+                color: viewModel.collectionIconColor,
+                icon: Icon(Icons.movie_creation_outlined),
+                onPressed: () => viewModel.onCollectionIconPress(),
+              ),
+              IconButton(
+                color: viewModel.accountIconColor,
+                icon: Icon(Icons.account_circle_sharp),
+                onPressed: () => viewModel.onAccountIconPress(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

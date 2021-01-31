@@ -2,7 +2,7 @@ import 'package:daca/viewmodels/sign_up_view_model.dart';
 import 'package:gender_selection/gender_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:daca/public/strings.dart';
-import 'package:daca/colors.dart';
+import 'package:daca/public/colors.dart';
 
 class SignUpView extends StatelessWidget {
   static String tag = 'signUpView';

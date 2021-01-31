@@ -2,7 +2,6 @@ import 'package:daca/public/strings.dart';
 import 'package:daca/public/variables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_place/google_place.dart';
 import 'package:flutter/foundation.dart';
@@ -19,7 +18,12 @@ class TravelMapViewModel with ChangeNotifier {
   bool allChipState = true;
   Position currentPosition;
 
+  Function onCurrentPositionChangeCallback;
+
   TravelMapViewModel();
+
+  void setOnCurrentPositionChange(Function callback) =>
+      this.onCurrentPositionChangeCallback = callback;
 
   void onFoodChipPress() {
     this.foodChipState = !this.foodChipState;
@@ -67,32 +71,17 @@ class TravelMapViewModel with ChangeNotifier {
     this.friendChipState = state;
   }
 
-  Future<void> getCurrentPosition(GoogleMapController controller) async {
+  Future<void> getCurrentPosition() async {
     await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((value) => {
               this.currentPosition = value,
-              notifyListeners(),
-              // updateMapPosition(controller, this.currentPosition),
+              this.onCurrentPositionChangeCallback(this.currentPosition),
             })
         .catchError((err) => {
               print(err),
               Fluttertoast.showToast(
                   msg: DaCaStrings.retrieveCurrentPositionError),
             });
-  }
-
-  void updateMapPosition(GoogleMapController controller, Position position) {
-    controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(
-            position.latitude,
-            position.longitude,
-          ),
-          zoom: this.zoomAmount,
-        ),
-      ),
-    );
   }
 }

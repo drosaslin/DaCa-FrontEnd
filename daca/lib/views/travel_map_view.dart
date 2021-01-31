@@ -1,9 +1,8 @@
-import 'dart:async';
-
-import 'package:daca/colors.dart';
+import 'package:daca/public/colors.dart';
 import 'package:daca/public/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:daca/viewmodels/travel_map_view_model.dart';
@@ -47,7 +46,6 @@ class OptionChipsWidget extends StatelessWidget {
           spacing: 7.0,
           children: [
             FilterChip(
-              // avatar: CircleAvatar(child: Text('D')),
               label: Text(DaCaStrings.foodChip),
               selectedColor: DaCaColors.primaryColor,
               disabledColor: Colors.white,
@@ -94,20 +92,34 @@ class _MapWidgetState extends State<MapWidget> {
   GoogleMapController mapController;
 
   void _onMapCreated(GoogleMapController controller) async {
-    print('map created');
     mapController = controller;
-    // await this.widget.viewModel.getCurrentPosition(controller);
+  }
+
+  void onCurrentPositionChange(Position position) {
+    this.mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(
+                position.latitude,
+                position.longitude,
+              ),
+              zoom: 17,
+            ),
+          ),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<TravelMapViewModel>(context, listen: false);
+    viewModel.setOnCurrentPositionChange(this.onCurrentPositionChange);
+    viewModel.getCurrentPosition();
+
     return GoogleMap(
       onMapCreated: _onMapCreated,
       initialCameraPosition: CameraPosition(
         target: LatLng(0, 0),
-        // zoom: this.widget.viewModel.zoomAmount,
       ),
-      // markers: this.markers,
     );
   }
 }

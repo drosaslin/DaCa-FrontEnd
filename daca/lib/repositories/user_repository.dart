@@ -68,4 +68,10 @@ class UserRepository implements IRepository<User> {
     // TODO: implement update
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<User>> getListById(String id) {
+    // TODO: implement getListById
+    throw UnimplementedError();
+  }
 }

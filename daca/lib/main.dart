@@ -1,3 +1,4 @@
+import 'package:daca/views/map_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:daca/views/login_view.dart';
 import 'package:daca/views/sign_up_view.dart';
@@ -11,6 +12,7 @@ class MyApp extends StatelessWidget {
     LoginView.tag: (context) => LoginView(),
     SignUpView.tag: (context) => SignUpView(),
     TabNavigatorView.tag: (context) => TabNavigatorView(),
+    MapSearchView.tag: (context) => MapSearchView(),
   };
 
   @override

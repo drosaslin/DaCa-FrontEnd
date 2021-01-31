@@ -1,43 +1,96 @@
-import 'package:flutter/rendering.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_place/src/search/search_result.dart';
+import 'photos.dart';
+import 'geometry.dart';
+import 'opening_hours.dart';
+import 'plus_code.dart';
 
-class Place extends SearchResult {
-  static int count = 0;
-  Marker _marker;
+class Place {
+  String businessStatus;
+  Geometry geometry;
+  String icon;
+  String name;
+  OpeningHours openingHours;
+  List<Photos> photos;
+  String placeId;
+  PlusCode plusCode;
+  int priceLevel;
+  num rating;
+  String reference;
+  String scope;
+  List<String> types;
+  int userRatingsTotal;
+  String vicinity;
 
-  Place(SearchResult searchResult)
-      : super(
-          geometry: searchResult.geometry,
-          businessStatus: searchResult.businessStatus,
-          openingHours: searchResult.openingHours,
-          photos: searchResult.photos,
-          plusCode: searchResult.plusCode,
-          formattedAddress: searchResult.formattedAddress,
-          name: searchResult.name,
-          rating: searchResult.rating,
-          icon: searchResult.icon,
-          id: searchResult.id,
-          placeId: searchResult.placeId,
-          priceLevel: searchResult.priceLevel,
-          reference: searchResult.reference,
-          scope: searchResult.scope,
-          types: searchResult.types,
-          userRatingsTotal: searchResult.userRatingsTotal,
-          vicinity: searchResult.vicinity,
-          permanentlyClosed: searchResult.permanentlyClosed,
-        ) {
-    this._marker = Marker(
-        markerId: MarkerId(Place.count.toString()),
-        position: LatLng(
-          this.geometry.location.lat,
-          this.geometry.location.lng,
-        ));
-    Place.count++;
+  Place(
+      {this.businessStatus,
+      this.geometry,
+      this.icon,
+      this.name,
+      this.openingHours,
+      this.photos,
+      this.placeId,
+      this.plusCode,
+      this.priceLevel,
+      this.rating,
+      this.reference,
+      this.scope,
+      this.types,
+      this.userRatingsTotal,
+      this.vicinity});
+
+  Place.fromJson(Map<String, dynamic> json) {
+    businessStatus = json['business_status'];
+    geometry = json['geometry'] != null
+        ? new Geometry.fromJson(json['geometry'])
+        : null;
+    icon = json['icon'];
+    name = json['name'];
+    openingHours = json['opening_hours'] != null
+        ? new OpeningHours.fromJson(json['opening_hours'])
+        : null;
+    if (json['photos'] != null) {
+      photos = new List<Photos>();
+      json['photos'].forEach((v) {
+        photos.add(new Photos.fromJson(v));
+      });
+    }
+    placeId = json['place_id'];
+    plusCode = json['plus_code'] != null
+        ? new PlusCode.fromJson(json['plus_code'])
+        : null;
+    priceLevel = json['price_level'];
+    rating = json['rating'];
+    reference = json['reference'];
+    scope = json['scope'];
+    types = json['types'].cast<String>();
+    userRatingsTotal = json['user_ratings_total'];
+    vicinity = json['vicinity'];
   }
 
-  Marker get marker => this._marker;
-
-  @override
-  bool operator ==(Object other) => other is Place && other.id == this.id;
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['business_status'] = this.businessStatus;
+    if (this.geometry != null) {
+      data['geometry'] = this.geometry.toJson();
+    }
+    data['icon'] = this.icon;
+    data['name'] = this.name;
+    if (this.openingHours != null) {
+      data['opening_hours'] = this.openingHours.toJson();
+    }
+    if (this.photos != null) {
+      data['photos'] = this.photos.map((v) => v.toJson()).toList();
+    }
+    data['place_id'] = this.placeId;
+    if (this.plusCode != null) {
+      data['plus_code'] = this.plusCode.toJson();
+    }
+    data['price_level'] = this.priceLevel;
+    data['rating'] = this.rating;
+    data['reference'] = this.reference;
+    data['scope'] = this.scope;
+    data['types'] = this.types;
+    data['user_ratings_total'] = this.userRatingsTotal;
+    data['vicinity'] = this.vicinity;
+    return data;
+  }
 }

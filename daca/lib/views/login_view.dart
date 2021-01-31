@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:daca/public/strings.dart';
-import 'package:daca/colors.dart';
+import 'package:daca/public/colors.dart';
 import 'package:daca/viewmodels/login_view_model.dart';
 
 class LoginView extends StatelessWidget {
