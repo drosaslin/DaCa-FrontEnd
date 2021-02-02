@@ -5,6 +5,7 @@ import 'plus_code.dart';
 
 class Place {
   String businessStatus;
+  String formattedAddress;
   Geometry geometry;
   String icon;
   String name;
@@ -22,6 +23,7 @@ class Place {
 
   Place(
       {this.businessStatus,
+      this.formattedAddress,
       this.geometry,
       this.icon,
       this.name,
@@ -39,6 +41,7 @@ class Place {
 
   Place.fromJson(Map<String, dynamic> json) {
     businessStatus = json['business_status'];
+    formattedAddress = json['formatted_address'];
     geometry = json['geometry'] != null
         ? new Geometry.fromJson(json['geometry'])
         : null;

@@ -20,6 +20,8 @@ class DaCaStrings {
 
   static final tabMapText = 'My Map';
 
+  static final searchHint = 'Search...';
+
   static final invalidCredentialsError = 'Invalid Credentials';
   static final retrieveCurrentPositionError =
       'Unable to retrieve current position';

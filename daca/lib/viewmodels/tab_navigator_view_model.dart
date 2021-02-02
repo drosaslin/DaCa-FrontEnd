@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 
 class TabNavigatorViewModel with ChangeNotifier {
   final selectedColor = DaCaColors.primaryColor;
-  final unselectedColor = DaCaColors.tabUnselectedColor;
+  final unselectedColor = DaCaColors.dacaGrey;
 
   Object currentView;
   HomePage magazineView;
