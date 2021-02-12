@@ -23,6 +23,8 @@ class DaCaStrings {
   static final searchHint = 'Search...';
 
   static final invalidCredentialsError = 'Invalid Credentials';
+  static final invalidParametersError = 'Invalid Parameters';
+  static final connectionError = 'Connection Error';
   static final retrieveCurrentPositionError =
       'Unable to retrieve current position';
 }

@@ -8,7 +8,7 @@ import 'package:daca/public/exceptions.dart';
 
 class LoginViewModel {
   final UserRepository repository = UserRepository();
-  User userModel;
+  User user;
   String userId;
   String password;
 
@@ -24,7 +24,7 @@ class LoginViewModel {
 
   Future<void> onLogin(BuildContext context) async {
     try {
-      this.userModel =
+      this.user =
           await this.repository.getByIdAndPassword(this.userId, this.password);
       Navigator.of(context).pushNamed(TabNavigatorView.tag);
     } on InvalidCredentialsException catch (err) {

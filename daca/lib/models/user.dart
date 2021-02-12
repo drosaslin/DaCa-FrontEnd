@@ -17,7 +17,6 @@ class User {
       this.birthday});
 
   factory User.fromJson(final json) {
-    print(json);
     return User(
       userId: json[DaCaVariables.userIdField],
       email: json[DaCaVariables.userEmailField],

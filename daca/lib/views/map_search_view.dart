@@ -4,9 +4,12 @@ import 'package:daca/viewmodels/map_search_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class MapSearchView extends StatelessWidget {
   static String tag = 'mapSearchView';
+
+  MapSearchView();
 
   @override
   Widget build(BuildContext context) {
@@ -113,24 +116,50 @@ class SearchResults extends StatelessWidget {
                       subtitle: Text(place.formattedAddress),
                       onTap: () => {
                             this.onPlaceTapCallback(),
+                            viewModel.setSelectedPlace(place),
                             showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
                                     scrollable: true,
-                                    title: Text(place.name),
+                                    title: Text(viewModel.selectedPlace.name),
                                     content: Form(
                                       child: Column(
                                         children: <Widget>[
                                           TextFormField(
+                                            initialValue:
+                                                viewModel.travelReview.title,
                                             autofocus: true,
                                             decoration: InputDecoration(
                                               labelText: 'Title',
                                             ),
+                                            onChanged: (text) =>
+                                                viewModel.onTitleChange(text),
                                           ),
-                                          TextFormField(
-                                            decoration: InputDecoration(
-                                              labelText: 'Rating',
+                                          Divider(color: Colors.transparent),
+                                          ListTile(
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    horizontal: 0.0),
+                                            title: Text('Rating'),
+                                            subtitle: RatingBar.builder(
+                                              glow: false,
+                                              initialRating:
+                                                  viewModel.travelReview.rating,
+                                              minRating: 0.5,
+                                              direction: Axis.horizontal,
+                                              allowHalfRating: true,
+                                              itemCount: 5,
+                                              itemBuilder: (context, _) => Icon(
+                                                Icons.star,
+                                                color: DaCaColors.primaryColor,
+                                              ),
+                                              onRatingUpdate: (rating) {
+                                                viewModel
+                                                    .onRatingChange(rating);
+                                                print(viewModel
+                                                    .travelReview.rating);
+                                              },
                                             ),
                                           ),
                                           TextFormField(
@@ -140,6 +169,8 @@ class SearchResults extends StatelessWidget {
                                             decoration: InputDecoration(
                                               labelText: 'Review',
                                             ),
+                                            onChanged: (text) =>
+                                                viewModel.onReviewChange(text),
                                           ),
                                         ],
                                       ),
@@ -147,8 +178,10 @@ class SearchResults extends StatelessWidget {
                                     actions: [
                                       RaisedButton(
                                           child: Text("Submit"),
-                                          onPressed: () {
-                                            // your code
+                                          onPressed: () async {
+                                            await viewModel
+                                                .onSubmitReviewPress();
+                                            Navigator.pop(context);
                                           })
                                     ],
                                   );

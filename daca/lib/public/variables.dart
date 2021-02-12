@@ -17,6 +17,7 @@ class DaCaVariables {
   // Local Storage Fields
   static const jwtToken = 'jwt';
   static const jwtRefreshToken = 'jwtRefresh';
+  static const userIdTokenField = 'user_id';
 
   // Backend Api Fields
   static const userBackendField = 'user';

@@ -6,6 +6,9 @@ import 'package:daca/repositories/irepository.dart';
 import 'package:daca/public/variables.dart';
 import 'package:http/http.dart' as http;
 
+/** 
+ ** Repository responsible to fetch google places data
+*/
 class PlaceRepository implements IRepository {
   final String placesSearchUrl = ApiEndpoint.googlePlacesSearchEndpoint;
 

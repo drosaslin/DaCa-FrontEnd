@@ -11,9 +11,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class UserRepository implements IRepository<User> {
   final storage = new FlutterSecureStorage();
 
-  final String loginUrl = ApiEndpoint.apiServer +
-      ApiEndpoint.authenticationRoute +
-      ApiEndpoint.loginEndpoint;
+  final String loginUrl =
+      '${ApiEndpoint.apiServer}${ApiEndpoint.authenticationRoute}${ApiEndpoint.loginEndpoint}';
 
   Future<User> getByIdAndPassword(String id, String password) async {
     var body = {
@@ -34,9 +33,12 @@ class UserRepository implements IRepository<User> {
 
       return User.fromJson(decodedBody[DaCaVariables.userBackendField]);
     }
+
     if (response.statusCode == 400) {
       throw InvalidCredentialsException(DaCaStrings.invalidCredentialsError);
     }
+
+    throw ConnectionException(DaCaStrings.connectionError);
   }
 
   @override
