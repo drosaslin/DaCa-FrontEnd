@@ -1,14 +1,21 @@
+import 'package:daca/models/travel_review.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/public/variables.dart';
+import 'package:daca/repositories/place_repository.dart';
+import 'package:daca/repositories/travel_review_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
 import 'package:flutter/foundation.dart';
 
 class TravelMapViewModel with ChangeNotifier {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   final GooglePlace googlePlace = GooglePlace(DaCaVariables.googleApiKey);
+  final PlaceRepository placeRepository = PlaceRepository();
+  final TravelReviewRepository travelReviewRepository =
+      TravelReviewRepository();
   final double zoomAmount = 13.0;
 
   bool foodChipState = true;
@@ -16,11 +23,16 @@ class TravelMapViewModel with ChangeNotifier {
   bool lifeChipState = true;
   bool friendChipState = true;
   bool allChipState = true;
+  Set<Marker> markers = {};
+  List<TravelReview> travelReviewList = [];
   Position currentPosition;
 
   Function onCurrentPositionChangeCallback;
 
-  TravelMapViewModel();
+  TravelMapViewModel() {
+    this.allChipState = true;
+    this.onAllChipPress();
+  }
 
   void setOnCurrentPositionChange(Function callback) =>
       this.onCurrentPositionChangeCallback = callback;
@@ -69,6 +81,22 @@ class TravelMapViewModel with ChangeNotifier {
     this.travelChipState = state;
     this.lifeChipState = state;
     this.friendChipState = state;
+  }
+
+  Future<void> getReviews() async {
+    this.travelReviewList = await this.travelReviewRepository.getList();
+    this.markers.clear();
+    for (var review in this.travelReviewList) {
+      MarkerId markerId = MarkerId(review.place.placeId);
+      LatLng position = LatLng(
+        review.place.geometry.location.lat,
+        review.place.geometry.location.lng,
+      );
+
+      this.markers.add(Marker(markerId: markerId, position: position));
+    }
+
+    notifyListeners();
   }
 
   Future<void> getCurrentPosition() async {

@@ -8,6 +8,8 @@ class ApiEndpoint {
   static const travelEndpoint = '/travel/';
 
   // Google Server
-  static const googlePlacesSearchEndpoint =
-      'https://maps.googleapis.com/maps/api/place/textsearch/json';
+  static const googlePlacesServer =
+      'https://maps.googleapis.com/maps/api/place';
+  static const googlePlacesTextSearchEndpoint = '/textsearch/json';
+  static const googlePlacesDetailsEndpoint = '/details/json';
 }

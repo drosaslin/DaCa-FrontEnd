@@ -1,6 +1,5 @@
 import 'package:daca/models/place.dart';
 import 'package:daca/models/travel_review.dart';
-import 'package:daca/models/user.dart';
 import 'package:daca/public/exceptions.dart';
 import 'package:daca/repositories/place_repository.dart';
 import 'package:daca/repositories/travel_review_repository.dart';
@@ -26,7 +25,7 @@ class MapSearchViewModel with ChangeNotifier {
 
   void setSelectedPlace(Place place) {
     this.selectedPlace = place;
-    this.travelReview.setPlaceId(this.selectedPlace.placeId);
+    this.travelReview.setPlace(Place(placeId: this.selectedPlace.placeId));
     this.travelReview.setTitle(this.selectedPlace.name);
     notifyListeners();
   }

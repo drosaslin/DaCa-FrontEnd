@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 
 class TravelReviewRepository implements IRepository<TravelReview> {
   final storage = new FlutterSecureStorage();
+  final headers = {'Content-Type': 'application/json'};
 
   final String travelUrl =
       '${ApiEndpoint.apiServer}${ApiEndpoint.apiRoute}${ApiEndpoint.travelEndpoint}';
@@ -23,9 +24,8 @@ class TravelReviewRepository implements IRepository<TravelReview> {
     body[DaCaVariables.userIdField] =
         decodedToken[DaCaVariables.userIdTokenField];
 
-    print(body.toString());
-
-    final response = await http.post(this.travelUrl, body: body);
+    final response = await http.post(this.travelUrl,
+        body: json.encode(body), headers: this.headers);
 
     if (response.statusCode == 201) {
       var decodedBody = jsonDecode(response.body);
@@ -33,6 +33,9 @@ class TravelReviewRepository implements IRepository<TravelReview> {
     }
     if (response.statusCode == 400) {
       throw InvalidParametersException(DaCaStrings.invalidParametersError);
+    }
+    if (response.statusCode == 402) {
+      throw InvalidParametersException(DaCaStrings.duplicateReview);
     }
 
     throw ConnectionException(DaCaStrings.connectionError);
@@ -51,9 +54,27 @@ class TravelReviewRepository implements IRepository<TravelReview> {
   }
 
   @override
-  Future<List<TravelReview>> getList() {
-    // TODO: implement getList
-    throw UnimplementedError();
+  Future<List<TravelReview>> getList() async {
+    String token = await storage.read(key: DaCaVariables.jwtToken);
+    var decodedToken = JwtDecoder.decode(token);
+    String userId = decodedToken[DaCaVariables.userIdTokenField];
+
+    String apiUrl = '${this.travelUrl}$userId/';
+
+    final response = await http.get(apiUrl);
+
+    if (response.statusCode == 200) {
+      var decodedBody = jsonDecode(response.body);
+      return (decodedBody as List)
+          .map((e) => TravelReview.fromJson(e))
+          .toList();
+    }
+
+    if (response.statusCode == 400) {
+      throw InvalidParametersException(DaCaStrings.invalidParametersError);
+    }
+
+    throw ConnectionException(DaCaStrings.connectionError);
   }
 
   @override

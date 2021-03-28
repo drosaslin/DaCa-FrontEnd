@@ -91,10 +91,6 @@ class MapWidget extends StatefulWidget {
 class _MapWidgetState extends State<MapWidget> {
   GoogleMapController mapController;
 
-  void _onMapCreated(GoogleMapController controller) async {
-    mapController = controller;
-  }
-
   void onCurrentPositionChange(Position position) {
     this.mapController.animateCamera(
           CameraUpdate.newCameraPosition(
@@ -111,15 +107,20 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<TravelMapViewModel>(context, listen: false);
+    final viewModel = Provider.of<TravelMapViewModel>(context, listen: true);
+
     viewModel.setOnCurrentPositionChange(this.onCurrentPositionChange);
-    viewModel.getCurrentPosition();
 
     return GoogleMap(
-      onMapCreated: _onMapCreated,
+      onMapCreated: (GoogleMapController controller) => {
+        this.mapController = controller,
+        viewModel.getCurrentPosition(),
+        viewModel.getReviews(),
+      },
       initialCameraPosition: CameraPosition(
         target: LatLng(0, 0),
       ),
+      markers: viewModel.markers,
     );
   }
 }

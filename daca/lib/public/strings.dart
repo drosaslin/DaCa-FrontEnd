@@ -24,6 +24,7 @@ class DaCaStrings {
 
   static final invalidCredentialsError = 'Invalid Credentials';
   static final invalidParametersError = 'Invalid Parameters';
+  static final duplicateReview = 'This review has already been created';
   static final connectionError = 'Connection Error';
   static final retrieveCurrentPositionError =
       'Unable to retrieve current position';

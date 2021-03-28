@@ -1,16 +1,18 @@
+import 'package:daca/models/place.dart';
+
 class TravelReview {
   int id;
   String title;
   String review;
-  String placeId;
   double rating;
   DateTime date;
+  Place place;
 
   TravelReview({
     this.id,
     this.title,
     this.review,
-    this.placeId,
+    this.place,
     this.rating,
     this.date,
   });
@@ -19,47 +21,31 @@ class TravelReview {
     this.id = null;
     this.title = "";
     this.review = "";
-    this.placeId = "";
+    this.place = null;
     this.rating = 2.5;
     this.date = DateTime.now();
   }
 
-  String getTitle() {
-    return this.title;
-  }
+  String getTitle() => this.title;
 
-  void setTitle(String title) {
-    this.title = title;
-  }
+  String getReview() => this.review;
 
-  String getReview() {
-    return this.review;
-  }
+  Place getPlace() => this.place;
 
-  void setReview(String review) {
-    this.review = review;
-  }
+  double getRating() => this.rating;
 
-  String getPlaceId() {
-    return this.placeId;
-  }
+  void setTitle(String title) => this.title = title;
 
-  void setPlaceId(String id) {
-    this.placeId = id;
-  }
+  void setReview(String review) => this.review = review;
 
-  double getRating() {
-    return this.rating;
-  }
+  void setPlace(Place place) => this.place = place;
 
-  void setRating(double rating) {
-    this.rating = rating;
-  }
+  void setRating(double rating) => this.rating = rating;
 
   factory TravelReview.fromJson(final json) {
     return TravelReview(
       id: json['id'],
-      placeId: json['place_id'],
+      place: Place.fromJson(json['place_details']),
       title: json['title'],
       review: json['review'],
       rating: json['rating'],
@@ -67,11 +53,13 @@ class TravelReview {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'place_id': this.placeId,
-        'title': this.title,
-        'review': this.review,
-        'rating': this.rating.toString(),
-        'date': this.date.toString(),
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'place_id': this.place.placeId,
+      'title': this.title,
+      'review': this.review,
+      'rating': this.rating.toString(),
+      'date': this.date.toString(),
+    };
+  }
 }

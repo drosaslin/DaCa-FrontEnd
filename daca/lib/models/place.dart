@@ -42,24 +42,22 @@ class Place {
   Place.fromJson(Map<String, dynamic> json) {
     businessStatus = json['business_status'];
     formattedAddress = json['formatted_address'];
-    geometry = json['geometry'] != null
-        ? new Geometry.fromJson(json['geometry'])
-        : null;
+    geometry =
+        json['geometry'] != null ? Geometry.fromJson(json['geometry']) : null;
     icon = json['icon'];
     name = json['name'];
     openingHours = json['opening_hours'] != null
-        ? new OpeningHours.fromJson(json['opening_hours'])
+        ? OpeningHours.fromJson(json['opening_hours'])
         : null;
     if (json['photos'] != null) {
-      photos = new List<Photos>();
+      photos = [];
       json['photos'].forEach((v) {
-        photos.add(new Photos.fromJson(v));
+        photos.add(Photos.fromJson(v));
       });
     }
     placeId = json['place_id'];
-    plusCode = json['plus_code'] != null
-        ? new PlusCode.fromJson(json['plus_code'])
-        : null;
+    plusCode =
+        json['plus_code'] != null ? PlusCode.fromJson(json['plus_code']) : null;
     priceLevel = json['price_level'];
     rating = json['rating'];
     reference = json['reference'];
@@ -70,7 +68,7 @@ class Place {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['business_status'] = this.businessStatus;
     if (this.geometry != null) {
       data['geometry'] = this.geometry.toJson();

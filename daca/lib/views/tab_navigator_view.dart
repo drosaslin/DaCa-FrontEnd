@@ -1,10 +1,8 @@
-import 'package:daca/models/user.dart';
 import 'package:daca/public/colors.dart';
 import 'package:daca/viewmodels/tab_navigator_view_model.dart';
 import 'package:daca/views/map_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:daca/public/strings.dart';
 import 'package:daca/customwidgets/ColoredSafeArea.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
