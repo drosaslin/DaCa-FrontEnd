@@ -1,32 +1,18 @@
 import 'package:daca/public/colors.dart';
-import 'package:daca/views/account.dart';
-import 'package:daca/views/homepage.dart';
-import 'package:daca/views/book_movie_collecction.dart';
-import 'package:daca/views/travel_map_view.dart';
 import 'package:flutter/cupertino.dart';
 
 class TabNavigatorViewModel with ChangeNotifier {
   final selectedColor = DaCaColors.primaryColor;
   final unselectedColor = DaCaColors.dacaGrey;
 
-  Object currentView;
-  HomePage magazineView;
-  TravelMapView travelView;
-  Collection collectionView;
-  Account accountView;
+  int selectedIndex;
   Color magazineIconColor;
   Color travelIconColor;
   Color collectionIconColor;
   Color accountIconColor;
 
   TabNavigatorViewModel() {
-    this.magazineView = HomePage();
-    this.currentView = this.magazineView;
-
-    this.travelView = null;
-    this.collectionView = null;
-    this.accountView = null;
-
+    this.selectedIndex = 0;
     this.magazineIconColor = this.selectedColor;
     this.travelIconColor = this.unselectedColor;
     this.collectionIconColor = this.unselectedColor;
@@ -34,44 +20,28 @@ class TabNavigatorViewModel with ChangeNotifier {
   }
 
   void onMagazineIconPress() {
-    if (this.magazineView == null) {
-      this.magazineView = HomePage();
-    }
-
-    this.currentView = this.magazineView;
+    this.selectedIndex = 0;
     deselectIcons();
     this.magazineIconColor = this.selectedColor;
     notifyListeners();
   }
 
   void onTravelIconPress() {
-    if (this.travelView == null) {
-      this.travelView = TravelMapView();
-    }
-
-    this.currentView = this.travelView;
+    this.selectedIndex = 1;
     deselectIcons();
     this.travelIconColor = this.selectedColor;
     notifyListeners();
   }
 
   void onCollectionIconPress() {
-    if (this.collectionView == null) {
-      this.collectionView = Collection();
-    }
-
-    this.currentView = this.collectionView;
+    this.selectedIndex = 2;
     deselectIcons();
     this.collectionIconColor = this.selectedColor;
     notifyListeners();
   }
 
   void onAccountIconPress() {
-    if (this.accountView == null) {
-      this.accountView = Account();
-    }
-
-    this.currentView = this.accountView;
+    this.selectedIndex = 3;
     deselectIcons();
     this.accountIconColor = this.selectedColor;
     notifyListeners();

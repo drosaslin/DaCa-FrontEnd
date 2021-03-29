@@ -1,10 +1,15 @@
 import 'package:daca/public/colors.dart';
 import 'package:daca/viewmodels/tab_navigator_view_model.dart';
+import 'package:daca/views/account.dart';
 import 'package:daca/views/map_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:daca/customwidgets/ColoredSafeArea.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+
+import 'book_movie_collecction.dart';
+import 'homepage.dart';
+import 'map_view.dart';
 
 class TabNavigatorView extends StatelessWidget {
   static String tag = 'tabNavigatorView';
@@ -18,19 +23,56 @@ class TabNavigatorView extends StatelessWidget {
   }
 }
 
-class TabController extends StatelessWidget {
-  TabController();
+class TabController extends StatefulWidget {
+  @override
+  _TabControllerState createState() => _TabControllerState();
+}
+
+class _TabControllerState extends State<TabController> {
+  int selectedPageIndex;
+  List<Widget> pages;
+  PageController pageController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    selectedPageIndex = 0;
+    pages = [
+      HomePage(),
+      MapView(),
+      Collection(),
+      Account(),
+    ];
+
+    pageController = PageController(initialPage: selectedPageIndex);
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+
+    super.dispose();
+  }
+
+  void onTapChange() {
+    setState(() {
+      final viewModel =
+          Provider.of<TabNavigatorViewModel>(context, listen: false);
+      selectedPageIndex = viewModel.selectedIndex;
+      pageController.jumpToPage(selectedPageIndex);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<TabNavigatorViewModel>(context);
-
     return ColoredSafeArea(
       color: DaCaColors.primaryColor,
       child: Scaffold(
-        body: ColoredSafeArea(
-          color: DaCaColors.primaryColor,
-          child: viewModel.currentView,
+        body: PageView(
+          controller: pageController,
+          physics: NeverScrollableScrollPhysics(),
+          children: pages,
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
@@ -38,7 +80,8 @@ class TabController extends StatelessWidget {
           backgroundColor: DaCaColors.primaryColor,
           onPressed: () => Navigator.of(context).pushNamed(MapSearchView.tag),
         ),
-        bottomNavigationBar: TabItemsWidget(),
+        bottomNavigationBar:
+            TabItemsWidget(onTabChangeCallback: this.onTapChange),
       ),
     );
   }
@@ -94,9 +137,14 @@ class _CustomFABState extends State<CustomFAB> with TickerProviderStateMixin {
 }
 
 class TabItemsWidget extends StatelessWidget {
+  final Function onTabChangeCallback;
+
+  TabItemsWidget({@required this.onTabChangeCallback});
+
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<TabNavigatorViewModel>(context);
+    final viewModel =
+        Provider.of<TabNavigatorViewModel>(context, listen: false);
 
     return Consumer<TabNavigatorViewModel>(
       builder: (BuildContext context, value, Widget child) => BottomAppBar(
@@ -110,23 +158,35 @@ class TabItemsWidget extends StatelessWidget {
               IconButton(
                 color: viewModel.magazineIconColor,
                 icon: Icon(Icons.menu_book),
-                onPressed: () => viewModel.onMagazineIconPress(),
+                onPressed: () => {
+                  viewModel.onMagazineIconPress(),
+                  this.onTabChangeCallback(),
+                },
               ),
               IconButton(
                 color: viewModel.travelIconColor,
                 icon: Icon(Icons.where_to_vote_sharp),
-                onPressed: () => viewModel.onTravelIconPress(),
+                onPressed: () => {
+                  viewModel.onTravelIconPress(),
+                  this.onTabChangeCallback(),
+                },
               ),
               SizedBox.shrink(),
               IconButton(
                 color: viewModel.collectionIconColor,
                 icon: Icon(Icons.movie_creation_outlined),
-                onPressed: () => viewModel.onCollectionIconPress(),
+                onPressed: () => {
+                  viewModel.onCollectionIconPress(),
+                  this.onTabChangeCallback(),
+                },
               ),
               IconButton(
                 color: viewModel.accountIconColor,
                 icon: Icon(Icons.account_circle_sharp),
-                onPressed: () => viewModel.onAccountIconPress(),
+                onPressed: () => {
+                  viewModel.onAccountIconPress(),
+                  this.onTabChangeCallback(),
+                },
               ),
             ],
           ),

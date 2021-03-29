@@ -18,6 +18,7 @@ class TravelMapViewModel with ChangeNotifier {
       TravelReviewRepository();
   final double zoomAmount = 13.0;
 
+  bool isDisposed = false;
   bool foodChipState = true;
   bool travelChipState = true;
   bool lifeChipState = true;
@@ -73,7 +74,9 @@ class TravelMapViewModel with ChangeNotifier {
         this.lifeChipState &&
         this.friendChipState);
 
-    notifyListeners();
+    if (!this.isDisposed) {
+      notifyListeners();
+    }
   }
 
   void setChipStates(bool state) {
@@ -96,7 +99,9 @@ class TravelMapViewModel with ChangeNotifier {
       this.markers.add(Marker(markerId: markerId, position: position));
     }
 
-    notifyListeners();
+    if (!this.isDisposed) {
+      notifyListeners();
+    }
   }
 
   Future<void> getCurrentPosition() async {
@@ -111,5 +116,11 @@ class TravelMapViewModel with ChangeNotifier {
               Fluttertoast.showToast(
                   msg: DaCaStrings.retrieveCurrentPositionError),
             });
+  }
+
+  @override
+  void dispose() {
+    this.isDisposed = true;
+    super.dispose();
   }
 }

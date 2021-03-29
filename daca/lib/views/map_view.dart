@@ -7,13 +7,13 @@ import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:daca/viewmodels/travel_map_view_model.dart';
 
-class TravelMapView extends StatefulWidget {
+class MapView extends StatefulWidget {
   @override
-  _TravelMapViewState createState() => _TravelMapViewState();
+  _MapViewState createState() => _MapViewState();
 }
 
-class _TravelMapViewState extends State<TravelMapView>
-    with AutomaticKeepAliveClientMixin<TravelMapView> {
+class _MapViewState extends State<MapView>
+    with AutomaticKeepAliveClientMixin<MapView> {
   @override
   bool get wantKeepAlive => true;
 
