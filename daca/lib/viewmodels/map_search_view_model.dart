@@ -1,12 +1,14 @@
 import 'package:daca/models/place.dart';
 import 'package:daca/models/travel_review.dart';
 import 'package:daca/public/exceptions.dart';
+import 'package:daca/public/strings.dart';
+import 'package:daca/public/subject.dart';
 import 'package:daca/repositories/place_repository.dart';
 import 'package:daca/repositories/travel_review_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class MapSearchViewModel with ChangeNotifier {
+class MapSearchViewModel extends Subject with ChangeNotifier {
   PlaceRepository placeRepository;
   TravelReviewRepository travelReviewRepository;
   List<Place> searchPlaceList;
@@ -15,12 +17,7 @@ class MapSearchViewModel with ChangeNotifier {
   String searchText;
 
   MapSearchViewModel() {
-    this.placeRepository = PlaceRepository();
-    this.travelReviewRepository = TravelReviewRepository();
-    this.travelReview = TravelReview.defaultReview();
-    this.searchText = "";
-    this.selectedPlace = null;
-    this.searchPlaceList = [];
+    this.setDefaultState();
   }
 
   void setSelectedPlace(Place place) {
@@ -42,6 +39,15 @@ class MapSearchViewModel with ChangeNotifier {
     this.travelReview.setRating(rating);
   }
 
+  void setDefaultState() {
+    this.placeRepository = PlaceRepository();
+    this.travelReviewRepository = TravelReviewRepository();
+    this.travelReview = TravelReview.defaultReview();
+    this.searchText = "";
+    this.selectedPlace = null;
+    this.searchPlaceList = [];
+  }
+
   void onSearchTextChange(String text) async {
     this.searchText = text;
 
@@ -55,12 +61,21 @@ class MapSearchViewModel with ChangeNotifier {
 
   Future<void> onSubmitReviewPress() async {
     try {
-      await this.travelReviewRepository.create(this.travelReview);
-      Fluttertoast.showToast(msg: 'Review Created!');
+      TravelReview review =
+          await this.travelReviewRepository.create(this.travelReview);
+      Fluttertoast.showToast(msg: DaCaStrings.reviewCreatedSuccess);
+
+      for (var observer in this.observers) {
+        observer.update(review);
+      }
+
+      print(review.toJson());
     } on InvalidParametersException catch (err) {
       Fluttertoast.showToast(msg: err.message);
     } on ConnectionException catch (err) {
       Fluttertoast.showToast(msg: err.message);
     }
+
+    this.setDefaultState();
   }
 }

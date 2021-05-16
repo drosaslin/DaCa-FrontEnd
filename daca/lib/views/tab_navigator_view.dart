@@ -1,10 +1,12 @@
 import 'package:daca/public/colors.dart';
+import 'package:daca/viewmodels/map_search_view_model.dart';
 import 'package:daca/viewmodels/tab_navigator_view_model.dart';
+import 'package:daca/viewmodels/map_view_model.dart';
 import 'package:daca/views/account.dart';
 import 'package:daca/views/map_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:daca/customwidgets/ColoredSafeArea.dart';
+import 'package:daca/views/customwidgets/ColoredSafeArea.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import 'book_movie_collecction.dart';
@@ -32,6 +34,8 @@ class _TabControllerState extends State<TabController> {
   int selectedPageIndex;
   List<Widget> pages;
   PageController pageController;
+  final MapViewModel mapViewModel = MapViewModel();
+  final MapSearchViewModel mapSearchViewModel = MapSearchViewModel();
 
   @override
   void initState() {
@@ -40,7 +44,7 @@ class _TabControllerState extends State<TabController> {
     selectedPageIndex = 0;
     pages = [
       HomePage(),
-      MapView(),
+      MapView(mapViewModel),
       Collection(),
       Account(),
     ];
@@ -78,7 +82,18 @@ class _TabControllerState extends State<TabController> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           backgroundColor: DaCaColors.primaryColor,
-          onPressed: () => Navigator.of(context).pushNamed(MapSearchView.tag),
+          onPressed: () => {
+            this.mapSearchViewModel.clearObservers(),
+            this.mapSearchViewModel.registerObserver(this.mapViewModel),
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChangeNotifierProvider.value(
+                    value: this.mapSearchViewModel,
+                    child: MapSearchView(),
+                  ),
+                )),
+          },
         ),
         bottomNavigationBar:
             TabItemsWidget(onTabChangeCallback: this.onTapChange),

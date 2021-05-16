@@ -40,7 +40,8 @@ class Place {
       this.vicinity});
 
   Place.fromJson(Map<String, dynamic> json) {
-    businessStatus = json['business_status'];
+    businessStatus =
+        json['business_status'] != null ? json['business_status'] : null;
     formattedAddress = json['formatted_address'];
     geometry =
         json['geometry'] != null ? Geometry.fromJson(json['geometry']) : null;

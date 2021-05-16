@@ -5,9 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:daca/viewmodels/travel_map_view_model.dart';
+import 'package:daca/viewmodels/map_view_model.dart';
 
 class MapView extends StatefulWidget {
+  final MapViewModel viewModel;
+
+  MapView(this.viewModel);
+
   @override
   _MapViewState createState() => _MapViewState();
 }
@@ -21,8 +25,8 @@ class _MapViewState extends State<MapView>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      body: ChangeNotifierProvider<TravelMapViewModel>(
-        create: (context) => TravelMapViewModel(),
+      body: ChangeNotifierProvider<MapViewModel>(
+        create: (context) => widget.viewModel,
         child: Stack(
           children: [
             MapWidget(),
@@ -37,9 +41,9 @@ class _MapViewState extends State<MapView>
 class OptionChipsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<TravelMapViewModel>(context);
+    final viewModel = Provider.of<MapViewModel>(context);
 
-    return Consumer<TravelMapViewModel>(
+    return Consumer<MapViewModel>(
       builder: (BuildContext context, value, Widget child) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Wrap(
@@ -90,6 +94,9 @@ class MapWidget extends StatefulWidget {
 
 class _MapWidgetState extends State<MapWidget> {
   GoogleMapController mapController;
+  final myLocationEnabled = true;
+  final myLocationbuttonEnabled = false;
+  final zoomControlsEnabled = false;
 
   void onCurrentPositionChange(Position position) {
     this.mapController.animateCamera(
@@ -107,7 +114,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<TravelMapViewModel>(context, listen: true);
+    final viewModel = Provider.of<MapViewModel>(context, listen: true);
 
     viewModel.setOnCurrentPositionChange(this.onCurrentPositionChange);
 
@@ -121,6 +128,9 @@ class _MapWidgetState extends State<MapWidget> {
         target: LatLng(0, 0),
       ),
       markers: viewModel.markers,
+      myLocationEnabled: this.myLocationEnabled,
+      myLocationButtonEnabled: this.myLocationbuttonEnabled,
+      zoomControlsEnabled: this.zoomControlsEnabled,
     );
   }
 }

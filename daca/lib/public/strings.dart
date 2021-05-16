@@ -21,6 +21,7 @@ class DaCaStrings {
   static final tabMapText = 'My Map';
 
   static final searchHint = 'Search...';
+  static final reviewCreatedSuccess = 'Review Created!';
 
   static final invalidCredentialsError = 'Invalid Credentials';
   static final invalidParametersError = 'Invalid Parameters';

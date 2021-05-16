@@ -1,4 +1,5 @@
 import 'package:daca/models/travel_review.dart';
+import 'package:daca/public/observer.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/public/variables.dart';
 import 'package:daca/repositories/place_repository.dart';
@@ -10,7 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
 import 'package:flutter/foundation.dart';
 
-class TravelMapViewModel with ChangeNotifier {
+class MapViewModel extends Observer with ChangeNotifier {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   final GooglePlace googlePlace = GooglePlace(DaCaVariables.googleApiKey);
   final PlaceRepository placeRepository = PlaceRepository();
@@ -89,6 +90,14 @@ class TravelMapViewModel with ChangeNotifier {
   Future<void> getReviews() async {
     this.travelReviewList = await this.travelReviewRepository.getList();
     this.markers.clear();
+    this.getMarkers();
+
+    if (!this.isDisposed) {
+      notifyListeners();
+    }
+  }
+
+  void getMarkers() {
     for (var review in this.travelReviewList) {
       MarkerId markerId = MarkerId(review.place.placeId);
       LatLng position = LatLng(
@@ -96,11 +105,16 @@ class TravelMapViewModel with ChangeNotifier {
         review.place.geometry.location.lng,
       );
 
-      this.markers.add(Marker(markerId: markerId, position: position));
-    }
-
-    if (!this.isDisposed) {
-      notifyListeners();
+      this.markers.add(
+            Marker(
+              markerId: markerId,
+              position: position,
+              infoWindow: InfoWindow(
+                title: review.title,
+                snippet: review.review,
+              ),
+            ),
+          );
     }
   }
 
@@ -116,6 +130,17 @@ class TravelMapViewModel with ChangeNotifier {
               Fluttertoast.showToast(
                   msg: DaCaStrings.retrieveCurrentPositionError),
             });
+  }
+
+  @override
+  void update([review]) {
+    this.travelReviewList.add(review);
+    this.getMarkers();
+
+    if (!this.isDisposed) {
+      print(this.markers);
+      notifyListeners();
+    }
   }
 
   @override

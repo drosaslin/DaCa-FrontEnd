@@ -24,11 +24,13 @@ class TravelReviewRepository implements IRepository<TravelReview> {
     body[DaCaVariables.userIdField] =
         decodedToken[DaCaVariables.userIdTokenField];
 
+    print(json.encode(body));
+
     final response = await http.post(this.travelUrl,
         body: json.encode(body), headers: this.headers);
 
     if (response.statusCode == 201) {
-      var decodedBody = jsonDecode(response.body);
+      var decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
       return TravelReview.fromJson(decodedBody);
     }
     if (response.statusCode == 400) {
@@ -60,11 +62,12 @@ class TravelReviewRepository implements IRepository<TravelReview> {
     String userId = decodedToken[DaCaVariables.userIdTokenField];
 
     String apiUrl = '${this.travelUrl}$userId/';
+    print(apiUrl);
 
     final response = await http.get(apiUrl);
 
     if (response.statusCode == 200) {
-      var decodedBody = jsonDecode(response.body);
+      var decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
       return (decodedBody as List)
           .map((e) => TravelReview.fromJson(e))
           .toList();

@@ -43,6 +43,7 @@ class TravelReview {
   void setRating(double rating) => this.rating = rating;
 
   factory TravelReview.fromJson(final json) {
+    print(json);
     return TravelReview(
       id: json['id'],
       place: Place.fromJson(json['place_details']),
@@ -56,6 +57,7 @@ class TravelReview {
   Map<String, dynamic> toJson() {
     return {
       'place_id': this.place.placeId,
+      'place_details': this.place.toJson(),
       'title': this.title,
       'review': this.review,
       'rating': this.rating.toString(),

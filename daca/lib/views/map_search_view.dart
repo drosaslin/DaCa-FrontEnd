@@ -7,21 +7,24 @@ import 'package:provider/provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class MapSearchView extends StatelessWidget {
+  // final viewModel;
   static String tag = 'mapSearchView';
 
-  MapSearchView();
+  // MapSearchView(this.viewModel);
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<MapSearchViewModel>(
-      create: (context) => MapSearchViewModel(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Where to?'),
-          backgroundColor: DaCaColors.primaryColor,
-        ),
-        body: CustomSearchbar(),
+    return
+        //  ChangeNotifierProvider<MapSearchViewModel>(
+        // create: (context) => MapSearchViewModel(),
+        // child: Scaffold(
+        Scaffold(
+      appBar: AppBar(
+        title: Text('Where to?'),
+        backgroundColor: DaCaColors.primaryColor,
       ),
+      body: CustomSearchbar(),
+      // ),
     );
   }
 }
@@ -157,8 +160,6 @@ class SearchResults extends StatelessWidget {
                                               onRatingUpdate: (rating) {
                                                 viewModel
                                                     .onRatingChange(rating);
-                                                print(viewModel
-                                                    .travelReview.rating);
                                               },
                                             ),
                                           ),
