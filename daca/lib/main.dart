@@ -4,6 +4,7 @@ import 'package:daca/views/login_view.dart';
 import 'package:daca/views/sign_up_view.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/views/tab_navigator_view.dart';
+import 'package:daca/views/image_picker_view.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
     SignUpView.tag: (context) => SignUpView(),
     TabNavigatorView.tag: (context) => TabNavigatorView(),
     MapSearchView.tag: (context) => MapSearchView(),
+    'image': (context) => ImagePickerView(),
   };
 
   @override
@@ -24,7 +26,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.lightBlue,
         fontFamily: 'Nunito',
       ),
-      home: LoginView(),
+      home: ImagePickerView(),
       routes: routes,
     );
   }
