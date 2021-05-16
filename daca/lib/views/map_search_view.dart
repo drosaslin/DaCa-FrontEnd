@@ -1,6 +1,7 @@
 import 'package:daca/public/colors.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/viewmodels/map_search_view_model.dart';
+import 'package:daca/viewmodels/travel_map_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
@@ -93,100 +94,42 @@ class SearchResults extends StatelessWidget {
               return Column(
                 children: [
                   ListTile(
-                      leading: Container(
-                        height: 48,
-                        width: 48,
-                        child: Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: Image.network(
-                            place.icon,
-                            color: DaCaColors.primaryColor,
-                            fit: BoxFit.fitHeight,
-                          ),
-                        ),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey,
+                    leading: Container(
+                      height: 48,
+                      width: 48,
+                      child: Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: Image.network(
+                          place.icon,
+                          color: DaCaColors.primaryColor,
+                          fit: BoxFit.fitHeight,
                         ),
                       ),
-                      title: Text(
-                        place.name,
-                        overflow: TextOverflow.ellipsis,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey,
                       ),
-                      subtitle: Text(place.formattedAddress),
-                      onTap: () => {
-                            this.onPlaceTapCallback(),
-                            viewModel.setSelectedPlace(place),
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    scrollable: true,
-                                    title: Text(viewModel.selectedPlace.name),
-                                    content: Form(
-                                      child: Column(
-                                        children: <Widget>[
-                                          TextFormField(
-                                            initialValue:
-                                                viewModel.travelReview.title,
-                                            autofocus: true,
-                                            decoration: InputDecoration(
-                                              labelText: 'Title',
-                                            ),
-                                            onChanged: (text) =>
-                                                viewModel.onTitleChange(text),
-                                          ),
-                                          Divider(color: Colors.transparent),
-                                          ListTile(
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    horizontal: 0.0),
-                                            title: Text('Rating'),
-                                            subtitle: RatingBar.builder(
-                                              glow: false,
-                                              initialRating:
-                                                  viewModel.travelReview.rating,
-                                              minRating: 0.5,
-                                              direction: Axis.horizontal,
-                                              allowHalfRating: true,
-                                              itemCount: 5,
-                                              itemBuilder: (context, _) => Icon(
-                                                Icons.star,
-                                                color: DaCaColors.primaryColor,
-                                              ),
-                                              onRatingUpdate: (rating) {
-                                                viewModel
-                                                    .onRatingChange(rating);
-                                                print(viewModel
-                                                    .travelReview.rating);
-                                              },
-                                            ),
-                                          ),
-                                          TextFormField(
-                                            keyboardType:
-                                                TextInputType.multiline,
-                                            maxLines: null,
-                                            decoration: InputDecoration(
-                                              labelText: 'Review',
-                                            ),
-                                            onChanged: (text) =>
-                                                viewModel.onReviewChange(text),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    actions: [
-                                      RaisedButton(
-                                          child: Text("Submit"),
-                                          onPressed: () async {
-                                            await viewModel
-                                                .onSubmitReviewPress();
-                                            Navigator.pop(context);
-                                          })
-                                    ],
-                                  );
-                                }),
-                          }),
+                    ),
+                    title: Text(
+                      place.name,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text(place.formattedAddress),
+                    onTap: () => {
+                      this.onPlaceTapCallback(),
+                      viewModel.setSelectedPlace(place),
+                      showDialog(
+                        context: context,
+                        builder: (_) {
+                          return ChangeNotifierProvider<
+                              MapSearchViewModel>.value(
+                            value: viewModel,
+                            child: AddReviewDialog(),
+                          );
+                        },
+                      ),
+                    },
+                  ),
                   Divider(
                     thickness: 1.0,
                     height: 10.0,
@@ -200,6 +143,98 @@ class SearchResults extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class AddReviewDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = Provider.of<MapSearchViewModel>(context);
+
+    return AlertDialog(
+      scrollable: true,
+      title: Text(viewModel.selectedPlace.name),
+      content: Form(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            TextFormField(
+              initialValue: viewModel.travelReview.title,
+              autofocus: true,
+              decoration: InputDecoration(
+                labelText: 'Title',
+              ),
+              onChanged: (text) => viewModel.onTitleChange(text),
+            ),
+            Divider(color: Colors.transparent),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              title: Text('Rating'),
+              subtitle: RatingBar.builder(
+                glow: false,
+                initialRating: viewModel.travelReview.rating,
+                minRating: 0.5,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: DaCaColors.primaryColor,
+                ),
+                onRatingUpdate: (rating) {
+                  viewModel.onRatingChange(rating);
+                },
+              ),
+            ),
+            TextFormField(
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              decoration: InputDecoration(
+                labelText: 'Review',
+              ),
+              onChanged: (text) => viewModel.onReviewChange(text),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 10),
+              width: 75,
+              height: 75,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.black,
+                  width: 1,
+                ),
+                color: Colors.transparent,
+              ),
+              child: viewModel.travelReviewImage == null
+                  ? TextButton(
+                      onPressed: () => viewModel.onUploadImagePress(),
+                      child: Icon(
+                        Icons.add,
+                        color: DaCaColors.primaryColor,
+                      ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: FittedBox(
+                        child: Image.file(viewModel.travelReviewImage),
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          child: Text("Submit"),
+          onPressed: () async {
+            await viewModel.onSubmitReviewPress();
+            Navigator.pop(context);
+          },
+        )
+      ],
     );
   }
 }

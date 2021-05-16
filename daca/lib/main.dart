@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.lightBlue,
         fontFamily: 'Nunito',
       ),
-      home: ImagePickerView(),
+      home: TabNavigatorView(),
       routes: routes,
     );
   }
