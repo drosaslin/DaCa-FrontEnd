@@ -1,4 +1,5 @@
 import 'package:daca/models/place.dart';
+import 'package:daca/models/travel_review_image.dart';
 
 class TravelReview {
   int id;
@@ -7,6 +8,7 @@ class TravelReview {
   double rating;
   DateTime date;
   Place place;
+  List<TravelReviewImage> images;
 
   TravelReview({
     this.id,
@@ -15,6 +17,7 @@ class TravelReview {
     this.place,
     this.rating,
     this.date,
+    this.images,
   });
 
   TravelReview.defaultReview() {
@@ -26,6 +29,8 @@ class TravelReview {
     this.date = DateTime.now();
   }
 
+  int getId() => this.id;
+
   String getTitle() => this.title;
 
   String getReview() => this.review;
@@ -33,6 +38,8 @@ class TravelReview {
   Place getPlace() => this.place;
 
   double getRating() => this.rating;
+
+  String getImageUrl(int position) => this.images[position].getImageUrl();
 
   void setTitle(String title) => this.title = title;
 
@@ -50,6 +57,9 @@ class TravelReview {
       review: json['review'],
       rating: json['rating'],
       date: DateTime.parse(json['date']),
+      images: (json['images'] as List)
+          .map((i) => TravelReviewImage.fromJson(i))
+          .toList(),
     );
   }
 
