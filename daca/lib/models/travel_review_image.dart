@@ -1,3 +1,5 @@
+import 'package:daca/public/variables.dart';
+
 class TravelReviewImage {
   int id;
   String imageUrl;
@@ -13,15 +15,15 @@ class TravelReviewImage {
 
   factory TravelReviewImage.fromJson(final json) {
     return TravelReviewImage(
-      id: json['id'],
-      imageUrl: json['image'],
+      id: json[DaCaVariables.imageIdField],
+      imageUrl: json[DaCaVariables.imageField],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': this.id,
-      'image': this.imageUrl,
+      DaCaVariables.imageIdField: this.id,
+      DaCaVariables.imageField: this.imageUrl,
     };
   }
 }

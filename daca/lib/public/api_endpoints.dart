@@ -6,6 +6,7 @@ class ApiEndpoint {
   static const loginEndpoint = '/login/';
   static const registrationEndpoint = '/registration/';
   static const travelEndpoint = '/travel/';
+  static const travelImageEndpoint = '/travelImage/';
 
   // Google Server
   static const googlePlacesServer =

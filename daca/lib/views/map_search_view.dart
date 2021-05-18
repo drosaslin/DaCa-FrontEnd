@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:daca/public/colors.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/viewmodels/map_search_view_model.dart';
@@ -207,9 +209,9 @@ class AddReviewDialog extends StatelessWidget {
                 ),
                 color: Colors.transparent,
               ),
-              child: viewModel.travelReviewImage == null
+              child: viewModel.imagePath == null
                   ? TextButton(
-                      onPressed: () => viewModel.onUploadImagePress(),
+                      onPressed: () => viewModel.onSelectImagePress(),
                       child: Icon(
                         Icons.add,
                         color: DaCaColors.primaryColor,
@@ -218,7 +220,7 @@ class AddReviewDialog extends StatelessWidget {
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: FittedBox(
-                        child: Image.file(viewModel.travelReviewImage),
+                        child: Image.file(File(viewModel.imagePath)),
                         fit: BoxFit.fill,
                       ),
                     ),
