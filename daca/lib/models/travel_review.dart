@@ -43,7 +43,6 @@ class TravelReview {
   void setRating(double rating) => this.rating = rating;
 
   factory TravelReview.fromJson(final json) {
-    print(json);
     return TravelReview(
       id: json['id'],
       place: Place.fromJson(json['place_details']),
