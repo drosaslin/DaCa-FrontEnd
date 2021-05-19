@@ -1,20 +1,25 @@
 import 'package:daca/models/place.dart';
 import 'package:daca/models/travel_review.dart';
+import 'package:daca/models/travel_review_image.dart';
 import 'package:daca/public/exceptions.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/public/subject.dart';
 import 'package:daca/repositories/place_repository.dart';
+import 'package:daca/repositories/travel_review_image_repository.dart';
 import 'package:daca/repositories/travel_review_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MapSearchViewModel extends Subject with ChangeNotifier {
   PlaceRepository placeRepository;
   TravelReviewRepository travelReviewRepository;
+  TravelReviewImageRepository travelReviewImageRepository;
   List<Place> searchPlaceList;
   Place selectedPlace;
   TravelReview travelReview;
   String searchText;
+  String imagePath;
 
   MapSearchViewModel() {
     this.setDefaultState();
@@ -24,6 +29,7 @@ class MapSearchViewModel extends Subject with ChangeNotifier {
     this.selectedPlace = place;
     this.travelReview.setPlace(Place(placeId: this.selectedPlace.placeId));
     this.travelReview.setTitle(this.selectedPlace.name);
+    this.imagePath = null;
     notifyListeners();
   }
 
@@ -42,9 +48,11 @@ class MapSearchViewModel extends Subject with ChangeNotifier {
   void setDefaultState() {
     this.placeRepository = PlaceRepository();
     this.travelReviewRepository = TravelReviewRepository();
+    this.travelReviewImageRepository = TravelReviewImageRepository();
     this.travelReview = TravelReview.defaultReview();
     this.searchText = "";
     this.selectedPlace = null;
+    this.imagePath = null;
     this.searchPlaceList = [];
   }
 
@@ -59,17 +67,32 @@ class MapSearchViewModel extends Subject with ChangeNotifier {
     }
   }
 
+  Future<void> onSelectImagePress() async {
+    PickedFile file = await ImagePicker().getImage(source: ImageSource.gallery);
+
+    if (file != null) {
+      this.imagePath = file.path;
+      notifyListeners();
+    }
+  }
+
   Future<void> onSubmitReviewPress() async {
     try {
       TravelReview review =
           await this.travelReviewRepository.create(this.travelReview);
-      Fluttertoast.showToast(msg: DaCaStrings.reviewCreatedSuccess);
 
+      if (this.imagePath != null) {
+        await this
+            .travelReviewImageRepository
+            .create(TravelReviewImage(id: review.id, imageUrl: this.imagePath));
+      }
+
+      print(this.observers);
       for (var observer in this.observers) {
         observer.update(review);
       }
 
-      print(review.toJson());
+      Fluttertoast.showToast(msg: DaCaStrings.reviewCreatedSuccess);
     } on InvalidParametersException catch (err) {
       Fluttertoast.showToast(msg: err.message);
     } on ConnectionException catch (err) {

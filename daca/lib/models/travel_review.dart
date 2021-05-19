@@ -26,6 +26,7 @@ class TravelReview {
     this.review = "";
     this.place = null;
     this.rating = 2.5;
+    this.images = [];
     this.date = DateTime.now();
   }
 
@@ -39,7 +40,9 @@ class TravelReview {
 
   double getRating() => this.rating;
 
-  String getImageUrl(int position) => this.images[position].getImageUrl();
+  List<TravelReviewImage> getImageList() => this.images;
+
+  String getImageByIndex(int position) => this.images[position].getImageUrl();
 
   void setTitle(String title) => this.title = title;
 
@@ -48,6 +51,8 @@ class TravelReview {
   void setPlace(Place place) => this.place = place;
 
   void setRating(double rating) => this.rating = rating;
+
+  void addImage(TravelReviewImage image) => this.images.add(image);
 
   factory TravelReview.fromJson(final json) {
     return TravelReview(

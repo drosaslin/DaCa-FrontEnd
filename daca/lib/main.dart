@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     LoginView.tag: (context) => LoginView(),
     SignUpView.tag: (context) => SignUpView(),
     TabNavigatorView.tag: (context) => TabNavigatorView(),
-    MapSearchView.tag: (context) => MapSearchView(),
+    // MapSearchView.tag: (context) => MapSearchView(),
   };
 
   @override

@@ -134,6 +134,7 @@ class MapViewModel extends Observer with ChangeNotifier {
 
   @override
   void update([review]) {
+    print('updating...');
     this.travelReviewList.add(review);
     this.getMarkers();
 
