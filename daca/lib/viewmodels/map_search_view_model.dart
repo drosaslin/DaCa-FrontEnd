@@ -87,7 +87,6 @@ class MapSearchViewModel extends Subject with ChangeNotifier {
             .create(TravelReviewImage(id: review.id, imageUrl: this.imagePath));
       }
 
-      print(this.observers);
       for (var observer in this.observers) {
         observer.update(review);
       }
