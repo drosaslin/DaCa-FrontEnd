@@ -25,11 +25,13 @@ class MapViewModel extends Observer with ChangeNotifier {
   bool lifeChipState = true;
   bool friendChipState = true;
   bool allChipState = true;
+  TravelReview selectedReview = null;
   Set<Marker> markers = {};
   List<TravelReview> travelReviewList = [];
   Position currentPosition;
 
   Function onCurrentPositionChangeCallback;
+  Function onInfoWindowPressCallback;
 
   TravelMapViewModel() {
     this.allChipState = true;
@@ -38,6 +40,20 @@ class MapViewModel extends Observer with ChangeNotifier {
 
   void setOnCurrentPositionChange(Function callback) =>
       this.onCurrentPositionChangeCallback = callback;
+
+  void setOnInfoWindowPress(Function callback) =>
+      this.onInfoWindowPressCallback = callback;
+
+  void setSelectedReview(TravelReview review) {
+    this.selectedReview = review;
+  }
+
+  void onMapCreated() {
+    this.getCurrentPosition();
+    this.getReviews();
+
+    notifyListeners();
+  }
 
   void onFoodChipPress() {
     this.foodChipState = !this.foodChipState;
@@ -67,7 +83,7 @@ class MapViewModel extends Observer with ChangeNotifier {
 
   /* *
    * Setting the state of the allChipState to false if 
-   * -at least one chip is false and updating the view
+   * at least one chip is false and updating the view
   */
   void onChipStateChange() {
     this.allChipState = (this.foodChipState &&
@@ -75,9 +91,7 @@ class MapViewModel extends Observer with ChangeNotifier {
         this.lifeChipState &&
         this.friendChipState);
 
-    if (!this.isDisposed) {
-      notifyListeners();
-    }
+    notifyListeners();
   }
 
   void setChipStates(bool state) {
@@ -89,33 +103,6 @@ class MapViewModel extends Observer with ChangeNotifier {
 
   Future<void> getReviews() async {
     this.travelReviewList = await this.travelReviewRepository.getList();
-    this.markers.clear();
-    this.getMarkers();
-
-    if (!this.isDisposed) {
-      notifyListeners();
-    }
-  }
-
-  void getMarkers() {
-    for (var review in this.travelReviewList) {
-      MarkerId markerId = MarkerId(review.place.placeId);
-      LatLng position = LatLng(
-        review.place.geometry.location.lat,
-        review.place.geometry.location.lng,
-      );
-
-      this.markers.add(
-            Marker(
-              markerId: markerId,
-              position: position,
-              infoWindow: InfoWindow(
-                title: review.title,
-                snippet: review.review,
-              ),
-            ),
-          );
-    }
   }
 
   Future<void> getCurrentPosition() async {
@@ -136,11 +123,14 @@ class MapViewModel extends Observer with ChangeNotifier {
   void update([review]) {
     print('updating...');
     this.travelReviewList.add(review);
-    this.getMarkers();
 
+    notifyListeners();
+  }
+
+  @override
+  void notifyListeners() {
     if (!this.isDisposed) {
-      print(this.markers);
-      notifyListeners();
+      super.notifyListeners();
     }
   }
 

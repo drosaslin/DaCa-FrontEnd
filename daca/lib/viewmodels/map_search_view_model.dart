@@ -82,9 +82,14 @@ class MapSearchViewModel extends Subject with ChangeNotifier {
           await this.travelReviewRepository.create(this.travelReview);
 
       if (this.imagePath != null) {
-        await this
-            .travelReviewImageRepository
-            .create(TravelReviewImage(id: review.id, imageUrl: this.imagePath));
+        review.addImage(
+          await this.travelReviewImageRepository.create(
+                TravelReviewImage(
+                  id: review.id,
+                  imageUrl: this.imagePath,
+                ),
+              ),
+        );
       }
 
       for (var observer in this.observers) {

@@ -1,3 +1,4 @@
+import 'package:daca/models/travel_review.dart';
 import 'package:daca/public/colors.dart';
 import 'package:daca/public/strings.dart';
 import 'package:flutter/cupertino.dart';
@@ -112,25 +113,77 @@ class _MapWidgetState extends State<MapWidget> {
         );
   }
 
+  // void onInfoWindowPress(TravelReview review) {
+  // print(review.title);
+  // }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<MapViewModel>(context, listen: true);
 
+    /**
+     ** Setting up the callback functions needed for this view
+     */
     viewModel.setOnCurrentPositionChange(this.onCurrentPositionChange);
 
     return GoogleMap(
       onMapCreated: (GoogleMapController controller) => {
         this.mapController = controller,
-        viewModel.getCurrentPosition(),
-        viewModel.getReviews(),
+
+        /**
+         ** Fetching the user's current position and 
+         ** list of reviews after the map is created
+         */
+        viewModel.onMapCreated(),
       },
       initialCameraPosition: CameraPosition(
         target: LatLng(0, 0),
       ),
-      markers: viewModel.markers,
+      markers: Set<Marker>.of(
+        viewModel.travelReviewList.map(
+          (review) => Marker(
+            markerId: MarkerId(review.place.placeId),
+            position: LatLng(
+              review.place.geometry.location.lat,
+              review.place.geometry.location.lng,
+            ),
+            infoWindow: InfoWindow(
+              title: review.title,
+              snippet: review.review,
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => ReviewInfoDialog(travelReview: review),
+              ),
+            ),
+          ),
+        ),
+      ),
       myLocationEnabled: this.myLocationEnabled,
       myLocationButtonEnabled: this.myLocationbuttonEnabled,
       zoomControlsEnabled: this.zoomControlsEnabled,
+    );
+  }
+}
+
+class ReviewInfoDialog extends StatelessWidget {
+  final TravelReview travelReview;
+
+  ReviewInfoDialog({this.travelReview});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      scrollable: true,
+      title: Text(this.travelReview.title),
+      content: Form(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(this.travelReview.review),
+            Text(this.travelReview.rating.toString()),
+          ],
+        ),
+      ),
     );
   }
 }

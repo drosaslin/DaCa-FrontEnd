@@ -35,10 +35,6 @@ class CustomSearchbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<MapSearchViewModel>(context);
 
-    // Callback called after build is finished
-    // WidgetsBinding.instance
-    //     .addPostFrameCallback((_) => {this.controller.open()});
-
     return FloatingSearchBar(
       hint: DaCaStrings.searchHint,
       scrollPadding: EdgeInsets.only(top: 16, bottom: 56),
