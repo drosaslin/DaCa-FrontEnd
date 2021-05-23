@@ -1,10 +1,12 @@
+import 'package:daca/customwidgets/hero_dialog_route.dart';
 import 'package:daca/models/travel_review.dart';
-import 'package:daca/models/viewport.dart';
 import 'package:daca/public/colors.dart';
 import 'package:daca/public/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_place/google_place.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:daca/viewmodels/map_view_model.dart';
@@ -32,7 +34,16 @@ class _MapViewState extends State<MapView>
         child: Stack(
           children: [
             MapWidget(),
-            CustomInfoWindow(),
+            Builder(
+              builder: (context) {
+                final viewModel = Provider.of<MapViewModel>(context);
+                return Positioned(
+                  top: viewModel.getInfoWindowTop(),
+                  left: viewModel.getInfoWindowLeft(),
+                  child: CustomInfoWindow(),
+                );
+              },
+            ),
             OptionChipsWidget(),
           ],
         ),
@@ -44,21 +55,65 @@ class _MapViewState extends State<MapView>
 class CustomInfoWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<MapViewModel>(context, listen: true);
+    final viewModel = Provider.of<MapViewModel>(context);
 
-    return Positioned(
-      top: 0,
-      left: 0,
-      child: Container(
-        width: 100,
-        height: 100,
-        margin: EdgeInsets.only(
-          top: viewModel.getInfoWindowTop(),
-          left: viewModel.getInfoWindowLeft(),
+    return Visibility(
+      visible: viewModel.isInfoWindowVisible(),
+      child: GestureDetector(
+        onTap: () => {
+          Navigator.of(context).push(
+            HeroDialogRoute(
+              builder: (context) => Center(
+                child: ReviewModal(review: viewModel.selectedReview),
+              ),
+            ),
+          ),
+        },
+        child: Hero(
+          tag: (viewModel.selectedReview != null)
+              ? viewModel.selectedReview.id
+              : '',
+          child: Material(
+            child: Container(
+              width: 100,
+              height: 100,
+              color: Colors.white,
+              child: (viewModel.isInfoWindowVisible())
+                  ? Text(viewModel.selectedReview.title)
+                  : Text(''),
+            ),
+          ),
         ),
-        color: Colors.blue,
       ),
     );
+  }
+}
+
+class ReviewModal extends StatelessWidget {
+  final review;
+
+  ReviewModal({this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+        tag: review.id,
+        child: Material(
+          child: Container(
+            width: 300,
+            height: 500,
+            color: Colors.white,
+            child: Container(
+              child: Text(
+                review.title,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 30,
+                ),
+              ),
+            ),
+          ),
+        ));
   }
 }
 
@@ -158,19 +213,27 @@ class _MapWidgetState extends State<MapWidget> {
       initialCameraPosition: CameraPosition(
         target: LatLng(0, 0),
       ),
+      onTap: (_) => viewModel.setSelectedReview(null),
       onCameraMove: (_) async {
-        final coordinates = await this.mapController.getScreenCoordinate(
-              LatLng(
-                viewModel.selectedReview.place.geometry.location.lat,
-                viewModel.selectedReview.place.geometry.location.lng,
-              ),
-            );
+        if (viewModel.getSelectedReview() != null) {
+          final coordinates = await this.mapController.getScreenCoordinate(
+                LatLng(
+                  viewModel
+                      .getSelectedReview()
+                      .getPlace()
+                      .geometry
+                      .location
+                      .lat,
+                  viewModel.getSelectedReview().place.geometry.location.lng,
+                ),
+              );
 
-        viewModel.onMapPositionChange(
-          coordinates.x.toDouble(),
-          coordinates.y.toDouble(),
-          MediaQuery.of(context).devicePixelRatio,
-        );
+          viewModel.onMapPositionChange(
+            coordinates.x.toDouble(),
+            coordinates.y.toDouble(),
+            MediaQuery.of(context).devicePixelRatio,
+          );
+        }
       },
       markers: Set<Marker>.of(
         viewModel.travelReviewList.map(
@@ -197,11 +260,6 @@ class _MapWidgetState extends State<MapWidget> {
                 MediaQuery.of(context).devicePixelRatio,
               );
             },
-            // infoWindow: InfoWindow(
-            // title: review.title,
-            // snippet: review.review,
-            // onTap: () {},
-            // ),
           ),
         ),
       ),
@@ -212,25 +270,25 @@ class _MapWidgetState extends State<MapWidget> {
   }
 }
 
-class ReviewInfoDialog extends StatelessWidget {
-  final TravelReview travelReview;
+// class ReviewInfoDialog extends StatelessWidget {
+  // final TravelReview travelReview;
 
-  ReviewInfoDialog({this.travelReview});
+  // ReviewInfoDialog({this.travelReview});
 
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      scrollable: true,
-      title: Text(this.travelReview.title),
-      content: Form(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(this.travelReview.review),
-            Text(this.travelReview.rating.toString()),
-          ],
-        ),
-      ),
-    );
-  }
-}
+  // @override
+  // Widget build(BuildContext context) {
+  //   return AlertDialog(
+  //     scrollable: true,
+  //     title: Text(this.travelReview.title),
+  //     content: Form(
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text(this.travelReview.review),
+  //           Text(this.travelReview.rating.toString()),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+// }

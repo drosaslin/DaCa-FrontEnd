@@ -51,6 +51,7 @@ class MapViewModel extends Observer with ChangeNotifier {
 
   void setSelectedReview(TravelReview review) {
     this.selectedReview = review;
+    notifyListeners();
   }
 
   void onMapCreated() {
@@ -103,6 +104,8 @@ class MapViewModel extends Observer with ChangeNotifier {
     this.infoWindowLeft = (x / devicePixelRatio) - (100 / 2);
     this.infoWindowTop = ((y / devicePixelRatio) - (100 / 2)) - 120;
 
+    print('$infoWindowLeft, $infoWindowTop');
+
     notifyListeners();
   }
 
@@ -113,9 +116,13 @@ class MapViewModel extends Observer with ChangeNotifier {
     this.friendChipState = state;
   }
 
+  TravelReview getSelectedReview() => this.selectedReview;
+
   double getInfoWindowTop() => this.infoWindowTop;
 
   double getInfoWindowLeft() => this.infoWindowLeft;
+
+  bool isInfoWindowVisible() => this.selectedReview != null;
 
   Future<void> getReviews() async {
     this.travelReviewList = await this.travelReviewRepository.getList();
