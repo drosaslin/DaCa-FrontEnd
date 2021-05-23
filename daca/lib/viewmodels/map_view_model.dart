@@ -28,7 +28,12 @@ class MapViewModel extends Observer with ChangeNotifier {
   TravelReview selectedReview = null;
   Set<Marker> markers = {};
   List<TravelReview> travelReviewList = [];
-  Position currentPosition;
+
+  /**
+   * * Positions for custom stacked info window widget
+   */
+  double infoWindowTop = 0;
+  double infoWindowLeft = 0;
 
   Function onCurrentPositionChangeCallback;
   Function onInfoWindowPressCallback;
@@ -94,12 +99,23 @@ class MapViewModel extends Observer with ChangeNotifier {
     notifyListeners();
   }
 
+  void onMapPositionChange(double x, double y, devicePixelRatio) {
+    this.infoWindowLeft = (x / devicePixelRatio) - (100 / 2);
+    this.infoWindowTop = ((y / devicePixelRatio) - (100 / 2)) - 120;
+
+    notifyListeners();
+  }
+
   void setChipStates(bool state) {
     this.foodChipState = state;
     this.travelChipState = state;
     this.lifeChipState = state;
     this.friendChipState = state;
   }
+
+  double getInfoWindowTop() => this.infoWindowTop;
+
+  double getInfoWindowLeft() => this.infoWindowLeft;
 
   Future<void> getReviews() async {
     this.travelReviewList = await this.travelReviewRepository.getList();
@@ -109,8 +125,7 @@ class MapViewModel extends Observer with ChangeNotifier {
     await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((value) => {
-              this.currentPosition = value,
-              this.onCurrentPositionChangeCallback(this.currentPosition),
+              this.onCurrentPositionChangeCallback(value),
             })
         .catchError((err) => {
               print(err),

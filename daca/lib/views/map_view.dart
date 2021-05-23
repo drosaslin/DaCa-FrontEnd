@@ -1,4 +1,5 @@
 import 'package:daca/models/travel_review.dart';
+import 'package:daca/models/viewport.dart';
 import 'package:daca/public/colors.dart';
 import 'package:daca/public/strings.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,9 +32,31 @@ class _MapViewState extends State<MapView>
         child: Stack(
           children: [
             MapWidget(),
+            CustomInfoWindow(),
             OptionChipsWidget(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class CustomInfoWindow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = Provider.of<MapViewModel>(context, listen: true);
+
+    return Positioned(
+      top: 0,
+      left: 0,
+      child: Container(
+        width: 100,
+        height: 100,
+        margin: EdgeInsets.only(
+          top: viewModel.getInfoWindowTop(),
+          left: viewModel.getInfoWindowLeft(),
+        ),
+        color: Colors.blue,
       ),
     );
   }
@@ -113,10 +136,6 @@ class _MapWidgetState extends State<MapWidget> {
         );
   }
 
-  // void onInfoWindowPress(TravelReview review) {
-  // print(review.title);
-  // }
-
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<MapViewModel>(context, listen: true);
@@ -139,22 +158,50 @@ class _MapWidgetState extends State<MapWidget> {
       initialCameraPosition: CameraPosition(
         target: LatLng(0, 0),
       ),
+      onCameraMove: (_) async {
+        final coordinates = await this.mapController.getScreenCoordinate(
+              LatLng(
+                viewModel.selectedReview.place.geometry.location.lat,
+                viewModel.selectedReview.place.geometry.location.lng,
+              ),
+            );
+
+        viewModel.onMapPositionChange(
+          coordinates.x.toDouble(),
+          coordinates.y.toDouble(),
+          MediaQuery.of(context).devicePixelRatio,
+        );
+      },
       markers: Set<Marker>.of(
         viewModel.travelReviewList.map(
           (review) => Marker(
+            consumeTapEvents: true,
             markerId: MarkerId(review.place.placeId),
             position: LatLng(
               review.place.geometry.location.lat,
               review.place.geometry.location.lng,
             ),
-            infoWindow: InfoWindow(
-              title: review.title,
-              snippet: review.review,
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => ReviewInfoDialog(travelReview: review),
-              ),
-            ),
+            onTap: () async {
+              viewModel.setSelectedReview(review);
+
+              final coordinates = await this.mapController.getScreenCoordinate(
+                    LatLng(
+                      review.place.geometry.location.lat,
+                      review.place.geometry.location.lng,
+                    ),
+                  );
+
+              viewModel.onMapPositionChange(
+                coordinates.x.toDouble(),
+                coordinates.y.toDouble(),
+                MediaQuery.of(context).devicePixelRatio,
+              );
+            },
+            // infoWindow: InfoWindow(
+            // title: review.title,
+            // snippet: review.review,
+            // onTap: () {},
+            // ),
           ),
         ),
       ),
