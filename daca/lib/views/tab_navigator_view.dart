@@ -30,12 +30,15 @@ class TabController extends StatefulWidget {
   _TabControllerState createState() => _TabControllerState();
 }
 
-class _TabControllerState extends State<TabController> {
+class _TabControllerState extends State<TabController>
+    with TickerProviderStateMixin {
   int selectedPageIndex;
   List<Widget> pages;
   PageController pageController;
   final MapViewModel mapViewModel = MapViewModel();
   final MapSearchViewModel mapSearchViewModel = MapSearchViewModel();
+  double height = 50;
+  double heightDelta = 150;
 
   @override
   void initState() {
@@ -72,81 +75,58 @@ class _TabControllerState extends State<TabController> {
   Widget build(BuildContext context) {
     return ColoredSafeArea(
       color: DaCaColors.primaryColor,
-      child: Scaffold(
-        body: PageView(
-          controller: pageController,
-          physics: NeverScrollableScrollPhysics(),
-          children: pages,
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          backgroundColor: DaCaColors.primaryColor,
-          onPressed: () => {
-            this.mapSearchViewModel.clearObservers(),
-            this.mapSearchViewModel.registerObserver(this.mapViewModel),
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChangeNotifierProvider.value(
-                    value: this.mapSearchViewModel,
-                    child: MapSearchView(),
-                  ),
-                )),
-          },
-        ),
-        bottomNavigationBar:
-            TabItemsWidget(onTabChangeCallback: this.onTapChange),
-      ),
-    );
-  }
-}
-
-class CustomFAB extends StatefulWidget {
-  @override
-  _CustomFABState createState() => _CustomFABState();
-}
-
-class _CustomFABState extends State<CustomFAB> with TickerProviderStateMixin {
-  @override
-  Widget build(BuildContext context) {
-    return SpeedDial(
-      animatedIcon: AnimatedIcons.menu_close,
-      animatedIconTheme: IconThemeData(size: 22.0),
-      // child: Icon(Icons.add),
-      onOpen: () => print('OPENING DIAL'),
-      onClose: () => print('DIAL CLOSED'),
-      visible: true,
-      curve: Curves.bounceIn,
-      children: [
-        SpeedDialChild(
-          child: Icon(Icons.accessibility, color: Colors.white),
-          backgroundColor: Colors.deepOrange,
-          onTap: () => print('FIRST CHILD'),
-          label: 'First Child',
-          labelStyle: TextStyle(fontWeight: FontWeight.w500),
-          labelBackgroundColor: Colors.deepOrangeAccent,
-        ),
-        SpeedDialChild(
-          child: Icon(Icons.brush, color: Colors.white),
-          backgroundColor: Colors.green,
-          onTap: () => print('SECOND CHILD'),
-          label: 'Second Child',
-          labelStyle: TextStyle(fontWeight: FontWeight.w500),
-          labelBackgroundColor: Colors.green,
-        ),
-        SpeedDialChild(
-          child: Icon(Icons.keyboard_voice, color: Colors.white),
-          backgroundColor: Colors.blue,
-          onTap: () => print('THIRD CHILD'),
-          labelWidget: Container(
-            color: Colors.blue,
-            margin: EdgeInsets.only(right: 10),
-            padding: EdgeInsets.all(6),
-            child: Text('Custom Label Widget'),
+      child: Stack(
+        children: [
+          Scaffold(
+            body: PageView(
+              controller: pageController,
+              physics: NeverScrollableScrollPhysics(),
+              children: pages,
+            ),
+            bottomNavigationBar:
+                TabItemsWidget(onTabChangeCallback: this.onTapChange),
           ),
-        ),
-      ],
+          Positioned.fill(
+            bottom: 30,
+            // left: MediaQuery.of(context).size.width / 2 - (height / 2),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 500),
+                curve: Curves.easeInOutQuart,
+                width: height,
+                height: height,
+                child: CustomButtonShape(),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            bottom: 10,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: GestureDetector(
+                onTap: () {
+                  print('clicked');
+                  setState(
+                    () {
+                      height += heightDelta;
+                      heightDelta *= -1;
+                    },
+                  );
+                },
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
@@ -209,4 +189,70 @@ class TabItemsWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class CustomButtonShape extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ClipPath(
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.blue,
+      ),
+      clipper: CustomShape(),
+    );
+  }
+}
+
+class CustomShape extends CustomClipper<Path> {
+  var radius = 10.0;
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    double roundnessFactor = size.height / 8;
+    // double roundnessFactor = 25;
+    double bottomButtomHeight = size.height / 4;
+
+    path.lineTo(0, size.height - bottomButtomHeight - roundnessFactor);
+    path.quadraticBezierTo(0, size.height - bottomButtomHeight, roundnessFactor,
+        size.height - bottomButtomHeight);
+
+    path.lineTo(size.width - roundnessFactor, size.height - bottomButtomHeight);
+    path.quadraticBezierTo(size.width, size.height - bottomButtomHeight,
+        size.width, size.height - bottomButtomHeight - roundnessFactor);
+
+    path.lineTo(size.width, roundnessFactor);
+    path.quadraticBezierTo(size.width, 0, size.width - roundnessFactor, 0);
+
+    path.lineTo(roundnessFactor, 0);
+    path.quadraticBezierTo(0, 0, 0, roundnessFactor);
+
+    path.moveTo(
+        size.width / 2 - bottomButtomHeight, size.height - bottomButtomHeight);
+    path.quadraticBezierTo(
+        size.width / 2 - roundnessFactor,
+        size.height - bottomButtomHeight,
+        size.width / 2 - roundnessFactor,
+        size.height - roundnessFactor);
+
+    path.lineTo(
+        size.width / 2 + roundnessFactor, size.height - roundnessFactor);
+    // path.lineTo(
+    // size.width / 2 - roundnessFactor, size.height - roundnessFactor);
+    // path.quadraticBezierTo(size.width / 2 - roundnessFactor, size.height,
+    //     size.width / 2, size.height);
+    // path.quadraticBezierTo(size.width / 2 + roundnessFactor, size.height,
+    //     size.width / 2 + roundnessFactor, size.height - roundnessFactor);
+    path.quadraticBezierTo(
+        size.width / 2 + roundnessFactor,
+        size.height - bottomButtomHeight,
+        size.width / 2 + bottomButtomHeight,
+        size.height - bottomButtomHeight);
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
