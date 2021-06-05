@@ -244,7 +244,7 @@ class CustomButtonShape extends StatelessWidget {
             height: double.infinity,
             color: DaCaColors.primaryColor,
             child: Padding(
-              padding: EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 20),
+              padding: EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 15),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
