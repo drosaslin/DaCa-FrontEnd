@@ -244,21 +244,27 @@ class CustomButtonShape extends StatelessWidget {
             height: double.infinity,
             color: DaCaColors.primaryColor,
             child: Padding(
-              padding: EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 15),
+              padding: EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ExpandableFabButton(
-                    text: 'Travel',
-                    icon: Icons.map_outlined,
+                  Expanded(
+                    child: ExpandableFabButton(
+                      text: 'Travel',
+                      icon: Icons.map_outlined,
+                    ),
                   ),
-                  ExpandableFabButton(
-                    text: 'Food',
-                    icon: Icons.restaurant_menu_outlined,
+                  Expanded(
+                    child: ExpandableFabButton(
+                      text: 'Food',
+                      icon: Icons.restaurant_menu_outlined,
+                    ),
                   ),
-                  ExpandableFabButton(
-                    text: 'Life',
-                    icon: Icons.family_restroom_outlined,
+                  Expanded(
+                    child: ExpandableFabButton(
+                      text: 'Life',
+                      icon: Icons.family_restroom_outlined,
+                    ),
                   ),
                 ],
               ),
@@ -282,18 +288,22 @@ class ExpandableFabButton extends StatelessWidget {
     return InkWell(
       onTap: () => print('$text tapped'),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            this.text,
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
+          Expanded(
+            flex: 3,
+            child: Text(
+              this.text,
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+              ),
             ),
           ),
-          Icon(
-            this.icon,
-            color: Colors.white,
+          Expanded(
+            child: Icon(
+              this.icon,
+              color: Colors.white,
+            ),
           )
         ],
       ),
