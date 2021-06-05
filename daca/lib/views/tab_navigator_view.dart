@@ -39,8 +39,8 @@ class _TabControllerState extends State<TabController>
   final MapSearchViewModel mapSearchViewModel = MapSearchViewModel();
   double height = 1;
   double width = 10;
-  double heightDelta = 199;
-  double widthDelta = 190;
+  double heightDelta = 159;
+  double widthDelta = 150;
   bool animationEnd = false;
 
   @override
@@ -113,7 +113,7 @@ class _TabControllerState extends State<TabController>
             child: Align(
               alignment: Alignment.bottomCenter,
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 500),
+                duration: Duration(milliseconds: 300),
                 curve: Curves.easeInOutQuart,
                 width: width,
                 height: height,
@@ -233,17 +233,70 @@ class TabItemsWidget extends StatelessWidget {
 class CustomButtonShape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ClipPath(
-      child: PhysicalModel(
-        color: Colors.black,
-        elevation: 8.0,
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: DaCaColors.primaryColor,
+    return Material(
+      color: Colors.transparent,
+      child: ClipPath(
+        child: PhysicalModel(
+          color: Colors.black,
+          elevation: 8.0,
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: DaCaColors.primaryColor,
+            child: Padding(
+              padding: EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ExpandableFabButton(
+                    text: 'Travel',
+                    icon: Icons.map_outlined,
+                  ),
+                  ExpandableFabButton(
+                    text: 'Food',
+                    icon: Icons.restaurant_menu_outlined,
+                  ),
+                  ExpandableFabButton(
+                    text: 'Life',
+                    icon: Icons.family_restroom_outlined,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
+        clipper: CustomShape(),
       ),
-      clipper: CustomShape(),
+    );
+  }
+}
+
+class ExpandableFabButton extends StatelessWidget {
+  final String text;
+  final IconData icon;
+
+  ExpandableFabButton({@required this.text, @required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => print('$text tapped'),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            this.text,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+            ),
+          ),
+          Icon(
+            this.icon,
+            color: Colors.white,
+          )
+        ],
+      ),
     );
   }
 }
