@@ -37,10 +37,11 @@ class _TabControllerState extends State<TabController>
   PageController pageController;
   final MapViewModel mapViewModel = MapViewModel();
   final MapSearchViewModel mapSearchViewModel = MapSearchViewModel();
-  double height = 0;
-  double width = 40;
-  double heightDelta = 200;
-  double widthDelta = 160;
+  double height = 1;
+  double width = 10;
+  double heightDelta = 199;
+  double widthDelta = 190;
+  bool animationEnd = false;
 
   @override
   void initState() {
@@ -89,7 +90,26 @@ class _TabControllerState extends State<TabController>
                 TabItemsWidget(onTabChangeCallback: this.onTapChange),
           ),
           Positioned.fill(
-            bottom: 50,
+            bottom: 67,
+            child: Visibility(
+              visible: animationEnd,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: PhysicalModel(
+                  color: Colors.amber,
+                  shadowColor: Colors.amber,
+                  elevation: 8,
+                  child: Container(
+                    width: width > 50 ? width - 50 : 0,
+                    height: 1,
+                    color: Colors.transparent,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            bottom: 40,
             child: Align(
               alignment: Alignment.bottomCenter,
               child: AnimatedContainer(
@@ -98,6 +118,11 @@ class _TabControllerState extends State<TabController>
                 width: width,
                 height: height,
                 child: CustomButtonShape(),
+                onEnd: () {
+                  setState(() {
+                    animationEnd = true;
+                  });
+                },
               ),
             ),
           ),
@@ -109,6 +134,7 @@ class _TabControllerState extends State<TabController>
                 onTap: () {
                   setState(
                     () {
+                      animationEnd = false;
                       width += widthDelta;
                       height += heightDelta;
                       heightDelta *= -1;
@@ -116,17 +142,23 @@ class _TabControllerState extends State<TabController>
                     },
                   );
                 },
-                child: Container(
-                  width: 55,
-                  height: 55,
-                  decoration: BoxDecoration(
-                    color: DaCaColors.primaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  child: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 30,
+                child: PhysicalModel(
+                  color: Colors.amber,
+                  shadowColor: Colors.amber,
+                  elevation: 8,
+                  shape: BoxShape.circle,
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: DaCaColors.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 30,
+                    ),
                   ),
                 ),
               ),
@@ -201,61 +233,55 @@ class TabItemsWidget extends StatelessWidget {
 class CustomButtonShape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // color: Colors.green,
-      child: ClipPath(
+    return ClipPath(
+      child: PhysicalModel(
+        color: Colors.black,
+        elevation: 8.0,
         child: Container(
           width: double.infinity,
           height: double.infinity,
           color: DaCaColors.primaryColor,
         ),
-        clipper: CustomShape(),
       ),
+      clipper: CustomShape(),
     );
   }
 }
 
 class CustomShape extends CustomClipper<Path> {
-  var radius = 10.0;
   @override
   Path getClip(Size size) {
     Path path = Path();
     double width = size.width;
     double height = size.height;
+    double box = 50;
+    double halfBox = box / 2;
+    double restPoint = height * 180 / 200;
+    double anglePoint = (width / 2 - halfBox);
+    double curve = width * 30 / 200;
 
-    double roundnessFactor = height / 6;
-    double bottomButtomHeight = height / 18;
+    path.moveTo(0, height * 3 / 4);
+    path.lineTo(0, height * 3 / 4);
 
-    path.lineTo(0, height - bottomButtomHeight - roundnessFactor);
-    path.quadraticBezierTo(0, height - bottomButtomHeight, roundnessFactor,
-        height - bottomButtomHeight);
+    path.quadraticBezierTo(0, restPoint, curve, restPoint);
 
-    path.lineTo(width - roundnessFactor, height - bottomButtomHeight);
-    path.quadraticBezierTo(width, height - bottomButtomHeight, width,
-        height - bottomButtomHeight - roundnessFactor);
+    path.lineTo(anglePoint - curve, restPoint);
+    path.quadraticBezierTo(anglePoint, restPoint, anglePoint, height);
 
-    path.lineTo(width, roundnessFactor);
-    path.quadraticBezierTo(width, 0, width - roundnessFactor, 0);
+    path.lineTo(anglePoint, height);
+    path.lineTo(anglePoint + box, height);
+    path.quadraticBezierTo(
+        anglePoint + box, restPoint, anglePoint + box + curve, restPoint);
+    path.lineTo(width - curve, restPoint);
 
-    path.lineTo(roundnessFactor, 0);
-    path.quadraticBezierTo(0, 0, 0, roundnessFactor);
+    path.quadraticBezierTo(width, restPoint, width, restPoint - curve);
+    path.lineTo(width, curve);
 
-    path.moveTo(width / 2 - 27.5 - 20, height - bottomButtomHeight);
-    path.quadraticBezierTo(width / 2 - 27.5, height - bottomButtomHeight,
-        width / 2 - 27.5, height);
+    path.quadraticBezierTo(width, 0, width - curve, 0);
 
-    path.lineTo(width / 2 + 27.5, height);
-    // path.lineTo(
-    // width / 2 - roundnessFactor, height - roundnessFactor);
-    // path.quadraticBezierTo(width / 2 - roundnessFactor, size.height,
-    //     width / 2, height);
-    // path.quadraticBezierTo(width / 2 + roundnessFactor, height,
-    //     width / 2 + roundnessFactor, height - roundnessFactor);
+    path.lineTo(curve, 0);
 
-    // path.lineTo(width / 2 + 27.5, height - bottomButtomHeight);
-
-    path.quadraticBezierTo(width / 2 + 27.5, height - bottomButtomHeight,
-        width / 2 + 27.5 + 20, height - bottomButtomHeight);
+    path.quadraticBezierTo(0, 0, 0, curve);
 
     return path;
   }
