@@ -1,9 +1,14 @@
 import 'package:daca/public/colors.dart';
+import 'package:daca/viewmodels/map_view_model.dart';
 import 'package:flutter/cupertino.dart';
+
+import 'map_search_view_model.dart';
 
 class TabNavigatorViewModel with ChangeNotifier {
   final selectedColor = DaCaColors.primaryColor;
   final unselectedColor = DaCaColors.dacaGrey;
+  final MapViewModel mapViewModel = MapViewModel();
+  final MapSearchViewModel mapSearchViewModel = MapSearchViewModel();
 
   int selectedIndex;
   Color magazineIconColor;

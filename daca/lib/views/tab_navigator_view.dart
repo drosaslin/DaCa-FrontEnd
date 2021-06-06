@@ -35,8 +35,6 @@ class _TabControllerState extends State<TabController>
   int selectedPageIndex;
   List<Widget> pages;
   PageController pageController;
-  final MapViewModel mapViewModel = MapViewModel();
-  final MapSearchViewModel mapSearchViewModel = MapSearchViewModel();
   double height = 1;
   double width = 10;
   double heightDelta = 159;
@@ -47,10 +45,13 @@ class _TabControllerState extends State<TabController>
   void initState() {
     super.initState();
 
+    final viewModel =
+        Provider.of<TabNavigatorViewModel>(context, listen: false);
+
     selectedPageIndex = 0;
     pages = [
       HomePage(),
-      MapView(mapViewModel),
+      MapView(viewModel.mapViewModel),
       Collection(),
       Account(),
     ];
@@ -285,8 +286,23 @@ class ExpandableFabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel =
+        Provider.of<TabNavigatorViewModel>(context, listen: false);
+
     return InkWell(
-      onTap: () => print('$text tapped'),
+      onTap: () => {
+        viewModel.mapSearchViewModel.clearObservers(),
+        viewModel.mapSearchViewModel.registerObserver(viewModel.mapViewModel),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChangeNotifierProvider.value(
+              value: viewModel.mapSearchViewModel,
+              child: MapSearchView(),
+            ),
+          ),
+        ),
+      },
       child: Row(
         children: [
           Expanded(
