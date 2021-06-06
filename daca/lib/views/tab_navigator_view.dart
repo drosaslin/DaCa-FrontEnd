@@ -287,6 +287,7 @@ class ExpandableFabButton extends StatelessWidget {
     return InkWell(
       onTap: () => {
         viewModel.onReviewTypePress(this.text),
+        viewModel.onOutsidePress(),
         Navigator.push(
           context,
           MaterialPageRoute(
