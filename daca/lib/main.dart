@@ -3,7 +3,7 @@ import 'package:daca/views/login_view.dart';
 import 'package:daca/views/sign_up_view.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/views/tab_navigator_view.dart';
-import 'package:daca/views/map_search_view.dart';
+import 'package:daca/views/place_search_view.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     LoginView.tag: (context) => LoginView(),
     SignUpView.tag: (context) => SignUpView(),
     TabNavigatorView.tag: (context) => TabNavigatorView(),
-    // MapSearchView.tag: (context) => MapSearchView(),
+    // MapSearchView.tag: (context) => PlaceSearchView(),
   };
 
   @override
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.lightBlue,
         fontFamily: 'Nunito',
       ),
-      home: TabNavigatorView(),
+      home: LoginView(),
       routes: routes,
     );
   }

@@ -1,13 +1,11 @@
 import 'package:daca/public/colors.dart';
-import 'package:daca/viewmodels/map_search_view_model.dart';
+import 'package:daca/public/strings.dart';
 import 'package:daca/viewmodels/tab_navigator_view_model.dart';
-import 'package:daca/viewmodels/map_view_model.dart';
 import 'package:daca/views/account.dart';
-import 'package:daca/views/map_search_view.dart';
+import 'package:daca/views/place_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:daca/views/customwidgets/ColoredSafeArea.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import 'book_movie_collecction.dart';
 import 'homepage.dart';
@@ -35,11 +33,6 @@ class _TabControllerState extends State<TabController>
   int selectedPageIndex;
   List<Widget> pages;
   PageController pageController;
-  double height = 1;
-  double width = 10;
-  double heightDelta = 159;
-  double widthDelta = 150;
-  bool animationEnd = false;
 
   @override
   void initState() {
@@ -77,6 +70,8 @@ class _TabControllerState extends State<TabController>
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<TabNavigatorViewModel>(context, listen: true);
+
     return ColoredSafeArea(
       color: DaCaColors.primaryColor,
       child: Stack(
@@ -91,9 +86,9 @@ class _TabControllerState extends State<TabController>
                 TabItemsWidget(onTabChangeCallback: this.onTapChange),
           ),
           Positioned.fill(
-            bottom: 67,
+            bottom: 66,
             child: Visibility(
-              visible: animationEnd,
+              visible: viewModel.animationEnd,
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: PhysicalModel(
@@ -101,7 +96,9 @@ class _TabControllerState extends State<TabController>
                   shadowColor: Colors.amber,
                   elevation: 8,
                   child: Container(
-                    width: width > 50 ? width - 50 : 0,
+                    width: viewModel.expandableFabWidth > 50
+                        ? viewModel.expandableFabWidth - 50
+                        : 0,
                     height: 1,
                     color: Colors.transparent,
                   ),
@@ -116,14 +113,10 @@ class _TabControllerState extends State<TabController>
               child: AnimatedContainer(
                 duration: Duration(milliseconds: 300),
                 curve: Curves.easeInOutQuart,
-                width: width,
-                height: height,
+                width: viewModel.expandableFabWidth,
+                height: viewModel.expandableFabHeight,
                 child: CustomButtonShape(),
-                onEnd: () {
-                  setState(() {
-                    animationEnd = true;
-                  });
-                },
+                onEnd: () => viewModel.onAnimationEnd(),
               ),
             ),
           ),
@@ -132,17 +125,7 @@ class _TabControllerState extends State<TabController>
             child: Align(
               alignment: Alignment.bottomCenter,
               child: GestureDetector(
-                onTap: () {
-                  setState(
-                    () {
-                      animationEnd = false;
-                      width += widthDelta;
-                      height += heightDelta;
-                      heightDelta *= -1;
-                      widthDelta *= -1;
-                    },
-                  );
-                },
+                onTap: () => viewModel.onAnimationStart(),
                 child: PhysicalModel(
                   color: Colors.amber,
                   shadowColor: Colors.amber,
@@ -245,25 +228,25 @@ class CustomButtonShape extends StatelessWidget {
             height: double.infinity,
             color: DaCaColors.primaryColor,
             child: Padding(
-              padding: EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 20),
+              padding: EdgeInsets.only(left: 22, right: 22, top: 5, bottom: 20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
                     child: ExpandableFabButton(
-                      text: 'Travel',
+                      text: DaCaStrings.travelReview,
                       icon: Icons.map_outlined,
                     ),
                   ),
                   Expanded(
                     child: ExpandableFabButton(
-                      text: 'Food',
+                      text: DaCaStrings.foodReview,
                       icon: Icons.restaurant_menu_outlined,
                     ),
                   ),
                   Expanded(
                     child: ExpandableFabButton(
-                      text: 'Life',
+                      text: DaCaStrings.lifeReview,
                       icon: Icons.family_restroom_outlined,
                     ),
                   ),
@@ -291,14 +274,13 @@ class ExpandableFabButton extends StatelessWidget {
 
     return InkWell(
       onTap: () => {
-        viewModel.mapSearchViewModel.clearObservers(),
-        viewModel.mapSearchViewModel.registerObserver(viewModel.mapViewModel),
+        viewModel.onReviewTypePress(this.text),
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChangeNotifierProvider.value(
-              value: viewModel.mapSearchViewModel,
-              child: MapSearchView(),
+              value: viewModel.placeSearchViewModel,
+              child: PlaceSearchView(),
             ),
           ),
         ),

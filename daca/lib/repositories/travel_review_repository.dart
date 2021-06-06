@@ -29,6 +29,8 @@ class TravelReviewRepository implements IRepository<TravelReview> {
     final response = await http.post(this.travelUrl,
         body: json.encode(body), headers: this.headers);
 
+    print(response.body);
+
     if (response.statusCode == 201) {
       var decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
       return TravelReview.fromJson(decodedBody);

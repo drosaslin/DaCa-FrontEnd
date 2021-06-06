@@ -14,6 +14,17 @@ class DaCaVariables {
   static const userGenderField = 'gender';
   static const userBirthdayField = 'birthday';
 
+  // Travel Review Api Fields
+  static const reviewIdField = 'id';
+  static const reviewPlaceIdField = 'place_id';
+  static const reviewTitleField = 'title';
+  static const reviewPlaceDetailsField = 'place_details';
+  static const reviewReviewField = 'review';
+  static const reviewTypeField = 'type';
+  static const reviewRatingField = 'rating';
+  static const reviewDateField = 'date';
+  static const reviewImagesField = 'images';
+
   // Image Api Fields
   static const imageIdField = 'id';
   static const imageReviewIdField = 'review';

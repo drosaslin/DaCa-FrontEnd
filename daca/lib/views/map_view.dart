@@ -113,10 +113,6 @@ class _MapWidgetState extends State<MapWidget> {
         );
   }
 
-  // void onInfoWindowPress(TravelReview review) {
-  // print(review.title);
-  // }
-
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<MapViewModel>(context, listen: true);
@@ -134,7 +130,7 @@ class _MapWidgetState extends State<MapWidget> {
          ** Fetching the user's current position and 
          ** list of reviews after the map is created
          */
-        // viewModel.onMapCreated(),
+        viewModel.onMapCreated(),
       },
       initialCameraPosition: CameraPosition(
         target: LatLng(0, 0),
