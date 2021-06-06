@@ -12,8 +12,8 @@ class TabNavigatorViewModel with ChangeNotifier {
 
   double expandableFabHeight = 1;
   double expandableFabWidth = 10;
-  double expandableFabHeightDelta = 169;
-  double expandableFabWidthDelta = 160;
+  double expandableFabHeightDelta = 159;
+  double expandableFabWidthDelta = 150;
 
   int selectedIndex;
   bool animationEnd;
@@ -72,14 +72,24 @@ class TabNavigatorViewModel with ChangeNotifier {
     this.placeSearchViewModel.type = type.toLowerCase();
   }
 
+  void onOutsidePress() {
+    if (isTypeSelectionOpen()) {
+      onAnimationStart();
+    }
+  }
+
+  bool isTypeSelectionOpen() {
+    return (this.expandableFabHeightDelta < 0);
+  }
+
   void onAnimationStart() {
     this.animationEnd = false;
 
-    this.expandableFabWidth *= -1;
-    this.expandableFabHeight *= -1;
-
     this.expandableFabWidth += this.expandableFabWidthDelta;
     this.expandableFabHeight += this.expandableFabHeightDelta;
+
+    this.expandableFabWidthDelta *= -1;
+    this.expandableFabHeightDelta *= -1;
 
     notifyListeners();
   }

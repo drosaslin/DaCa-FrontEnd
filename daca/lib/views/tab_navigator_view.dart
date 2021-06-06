@@ -64,6 +64,7 @@ class _TabControllerState extends State<TabController>
       final viewModel =
           Provider.of<TabNavigatorViewModel>(context, listen: false);
       selectedPageIndex = viewModel.selectedIndex;
+      viewModel.onOutsidePress();
       pageController.jumpToPage(selectedPageIndex);
     });
   }
@@ -84,6 +85,17 @@ class _TabControllerState extends State<TabController>
             ),
             bottomNavigationBar:
                 TabItemsWidget(onTabChangeCallback: this.onTapChange),
+          ),
+          Visibility(
+            visible: viewModel.isTypeSelectionOpen(),
+            child: GestureDetector(
+              onTap: () => viewModel.onOutsidePress(),
+              child: Container(
+                color: DaCaColors.dacaGrey,
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height - 88,
+              ),
+            ),
           ),
           Positioned.fill(
             bottom: 66,
