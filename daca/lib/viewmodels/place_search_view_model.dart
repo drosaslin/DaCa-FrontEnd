@@ -1,6 +1,7 @@
 import 'package:daca/models/place.dart';
 import 'package:daca/models/travel_review.dart';
 import 'package:daca/models/travel_review_image.dart';
+import 'package:daca/models/user.dart';
 import 'package:daca/public/exceptions.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/public/subject.dart';
@@ -21,6 +22,7 @@ class PlaceSearchViewModel extends Subject with ChangeNotifier {
   List<Place> searchPlaceList;
   Place selectedPlace;
   TravelReview travelReview;
+  User user;
   String title;
   String review;
   String type;
@@ -28,13 +30,15 @@ class PlaceSearchViewModel extends Subject with ChangeNotifier {
   String searchText;
   String imagePath;
 
-  PlaceSearchViewModel() {
+  PlaceSearchViewModel({@required this.user}) {
     this.setDefaultState();
+    this.user = user;
+    print(1);
+    print(this.user);
   }
 
   void onPlaceSelected(Place place) {
     this.selectedPlace = place;
-    // this.travelReview.setPlace(Place(placeId: this.selectedPlace.placeId));
     this.title = this.selectedPlace.name;
     this.imagePath = null;
     notifyListeners();
@@ -93,8 +97,9 @@ class PlaceSearchViewModel extends Subject with ChangeNotifier {
     );
 
     try {
-      TravelReview review =
-          await this.travelReviewRepository.create(reviewToCreate);
+      TravelReview review = await this
+          .travelReviewRepository
+          .createById(reviewToCreate, this.user.userId);
 
       if (this.imagePath != null) {
         review.addImage(

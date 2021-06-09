@@ -16,6 +16,27 @@ class TravelReviewRepository implements IRepository<TravelReview> {
   final String travelUrl =
       '${ApiEndpoint.apiServer}${ApiEndpoint.apiRoute}${ApiEndpoint.travelEndpoint}';
 
+  Future<TravelReview> createById(TravelReview review, String userId) async {
+    var body = review.toJson();
+    body[DaCaVariables.userIdField] = userId;
+
+    final response = await http.post(this.travelUrl,
+        body: json.encode(body), headers: this.headers);
+
+    if (response.statusCode == 201) {
+      var decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
+      return TravelReview.fromJson(decodedBody);
+    }
+    if (response.statusCode == 400) {
+      throw InvalidParametersException(DaCaStrings.invalidParametersError);
+    }
+    if (response.statusCode == 402) {
+      throw InvalidParametersException(DaCaStrings.duplicateReview);
+    }
+
+    throw ConnectionException(DaCaStrings.connectionError);
+  }
+
   @override
   Future<TravelReview> create(TravelReview review) async {
     String token = await storage.read(key: DaCaVariables.jwtToken);
@@ -24,12 +45,8 @@ class TravelReviewRepository implements IRepository<TravelReview> {
     body[DaCaVariables.userIdField] =
         decodedToken[DaCaVariables.userIdTokenField];
 
-    print(json.encode(body));
-
     final response = await http.post(this.travelUrl,
         body: json.encode(body), headers: this.headers);
-
-    print(response.body);
 
     if (response.statusCode == 201) {
       var decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
@@ -83,9 +100,23 @@ class TravelReviewRepository implements IRepository<TravelReview> {
   }
 
   @override
-  Future<List<TravelReview>> getListById(String id) {
-    // TODO: implement getListById
-    throw UnimplementedError();
+  Future<List<TravelReview>> getListById(String userId) async {
+    String apiUrl = '${this.travelUrl}$userId/';
+
+    final response = await http.get(apiUrl);
+
+    if (response.statusCode == 200) {
+      var decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
+      return (decodedBody as List)
+          .map((e) => TravelReview.fromJson(e))
+          .toList();
+    }
+
+    if (response.statusCode == 400) {
+      throw InvalidParametersException(DaCaStrings.invalidParametersError);
+    }
+
+    throw ConnectionException(DaCaStrings.connectionError);
   }
 
   @override

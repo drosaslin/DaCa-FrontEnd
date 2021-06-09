@@ -1,3 +1,4 @@
+import 'package:daca/models/user.dart';
 import 'package:daca/public/colors.dart';
 import 'package:daca/viewmodels/map_view_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,13 +8,15 @@ import 'place_search_view_model.dart';
 class TabNavigatorViewModel with ChangeNotifier {
   final selectedColor = DaCaColors.primaryColor;
   final unselectedColor = DaCaColors.dacaGrey;
-  final MapViewModel mapViewModel = MapViewModel();
-  final PlaceSearchViewModel placeSearchViewModel = PlaceSearchViewModel();
 
   double expandableFabHeight = 1;
   double expandableFabWidth = 10;
   double expandableFabHeightDelta = 159;
   double expandableFabWidthDelta = 150;
+
+  MapViewModel mapViewModel;
+  PlaceSearchViewModel placeSearchViewModel;
+  User user;
 
   int selectedIndex;
   bool animationEnd;
@@ -22,13 +25,20 @@ class TabNavigatorViewModel with ChangeNotifier {
   Color collectionIconColor;
   Color accountIconColor;
 
-  TabNavigatorViewModel() {
+  TabNavigatorViewModel(User user) {
     this.selectedIndex = 0;
     this.animationEnd = false;
     this.magazineIconColor = this.selectedColor;
     this.travelIconColor = this.unselectedColor;
     this.collectionIconColor = this.unselectedColor;
     this.accountIconColor = this.unselectedColor;
+    this.user = user;
+
+    print(0);
+    print(this.user);
+
+    this.mapViewModel = MapViewModel(user: this.user);
+    this.placeSearchViewModel = PlaceSearchViewModel(user: this.user);
   }
 
   void onMagazineIconPress() {

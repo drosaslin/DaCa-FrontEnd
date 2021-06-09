@@ -3,6 +3,7 @@ import 'package:daca/models/user.dart';
 import 'package:daca/views/tab_navigator_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daca/repositories/user_repository.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:daca/public/exceptions.dart';
 
@@ -24,10 +25,19 @@ class LoginViewModel {
 
   Future<void> onLogin(BuildContext context) async {
     try {
-      this.user =
-          await this.repository.getByIdAndPassword(this.userId, this.password);
-      Navigator.of(context).pushNamed(TabNavigatorView.tag);
+      this.user = await this.repository.getById(this.userId);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) {
+            return TabNavigatorView(user: this.user);
+          },
+        ),
+      );
+      // Navigator.of(context).pushNamed(TabNavigatorView.tag);
     } on InvalidCredentialsException catch (err) {
+      Fluttertoast.showToast(msg: err.message);
+    } on ConnectionException catch (err) {
       Fluttertoast.showToast(msg: err.message);
     }
   }

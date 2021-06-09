@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
     LoginView.tag: (context) => LoginView(),
     SignUpView.tag: (context) => SignUpView(),
-    TabNavigatorView.tag: (context) => TabNavigatorView(),
+    // TabNavigatorView.tag: (context) => TabNavigatorView(),
     // MapSearchView.tag: (context) => PlaceSearchView(),
   };
 

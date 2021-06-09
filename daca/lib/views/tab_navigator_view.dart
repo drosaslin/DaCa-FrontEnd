@@ -1,3 +1,4 @@
+import 'package:daca/models/user.dart';
 import 'package:daca/public/colors.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/viewmodels/tab_navigator_view_model.dart';
@@ -13,11 +14,14 @@ import 'map_view.dart';
 
 class TabNavigatorView extends StatelessWidget {
   static String tag = 'tabNavigatorView';
+  final User user;
+
+  TabNavigatorView({@required this.user});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<TabNavigatorViewModel>(
-      create: (context) => TabNavigatorViewModel(),
+      create: (context) => TabNavigatorViewModel(this.user),
       child: TabController(),
     );
   }

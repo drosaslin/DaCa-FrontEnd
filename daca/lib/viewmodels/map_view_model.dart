@@ -1,4 +1,5 @@
 import 'package:daca/models/travel_review.dart';
+import 'package:daca/models/user.dart';
 import 'package:daca/public/observer.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/public/variables.dart';
@@ -29,11 +30,12 @@ class MapViewModel extends Observer with ChangeNotifier {
   Set<Marker> markers = {};
   List<TravelReview> travelReviewList = [];
   Position currentPosition;
+  User user;
 
   Function onCurrentPositionChangeCallback;
   Function onInfoWindowPressCallback;
 
-  TravelMapViewModel() {
+  MapViewModel({@required this.user}) {
     this.allChipState = true;
     this.onAllChipPress();
   }
@@ -102,7 +104,8 @@ class MapViewModel extends Observer with ChangeNotifier {
   }
 
   Future<void> getReviews() async {
-    this.travelReviewList = await this.travelReviewRepository.getList();
+    this.travelReviewList =
+        await this.travelReviewRepository.getListById(this.user.userId);
   }
 
   Future<void> getCurrentPosition() async {
