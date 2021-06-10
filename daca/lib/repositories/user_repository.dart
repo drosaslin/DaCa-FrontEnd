@@ -12,7 +12,7 @@ class UserRepository implements IRepository<User> {
   final storage = new FlutterSecureStorage();
 
   final String loginUrl =
-      '${ApiEndpoint.apiServer}${ApiEndpoint.authenticationRoute}${ApiEndpoint.loginEndpoint}';
+      '${ApiEndpoint.apiServer}${ApiEndpoint.apiRoute}${ApiEndpoint.loginEndpoint}';
 
   Future<User> getByIdAndPassword(String id, String password) async {
     var body = {
@@ -54,9 +54,28 @@ class UserRepository implements IRepository<User> {
   }
 
   @override
-  Future<User> getById(String id) {
-    // TODO: implement getById
-    throw UnimplementedError();
+  Future<User> getById(String id) async {
+    print('${this.loginUrl}$id');
+    final response = await http.get('${this.loginUrl}$id');
+
+    if (response.statusCode == 200) {
+      var decodedBody = jsonDecode(response.body);
+      print(decodedBody);
+      // await storage.write(
+      //     key: DaCaVariables.jwtToken,
+      //     value: decodedBody[DaCaVariables.jwtTokenBackendField]);
+      // await storage.write(
+      //     key: DaCaVariables.jwtRefreshToken,
+      //     value: decodedBody[DaCaVariables.jwtRefreshTokenBackendField]);
+
+      return User.fromJson(decodedBody);
+    }
+
+    if (response.statusCode == 400) {
+      throw InvalidCredentialsException(DaCaStrings.invalidCredentialsError);
+    }
+
+    throw ConnectionException(DaCaStrings.connectionError);
   }
 
   @override

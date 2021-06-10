@@ -1,6 +1,7 @@
 import 'package:daca/models/place.dart';
 import 'package:daca/models/travel_review.dart';
 import 'package:daca/models/travel_review_image.dart';
+import 'package:daca/models/user.dart';
 import 'package:daca/public/exceptions.dart';
 import 'package:daca/public/strings.dart';
 import 'package:daca/public/subject.dart';
@@ -11,46 +12,55 @@ import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
-class MapSearchViewModel extends Subject with ChangeNotifier {
-  PlaceRepository placeRepository;
-  TravelReviewRepository travelReviewRepository;
-  TravelReviewImageRepository travelReviewImageRepository;
+class PlaceSearchViewModel extends Subject with ChangeNotifier {
+  final PlaceRepository placeRepository = PlaceRepository();
+  final TravelReviewRepository travelReviewRepository =
+      TravelReviewRepository();
+  final TravelReviewImageRepository travelReviewImageRepository =
+      TravelReviewImageRepository();
+
   List<Place> searchPlaceList;
   Place selectedPlace;
   TravelReview travelReview;
+  User user;
+  String title;
+  String review;
+  String type;
+  double rating;
   String searchText;
   String imagePath;
 
-  MapSearchViewModel() {
+  PlaceSearchViewModel({@required this.user}) {
     this.setDefaultState();
+    this.user = user;
+    print(1);
+    print(this.user);
   }
 
-  void setSelectedPlace(Place place) {
+  void onPlaceSelected(Place place) {
     this.selectedPlace = place;
-    this.travelReview.setPlace(Place(placeId: this.selectedPlace.placeId));
-    this.travelReview.setTitle(this.selectedPlace.name);
+    this.title = this.selectedPlace.name;
     this.imagePath = null;
     notifyListeners();
   }
 
   void onTitleChange(String text) {
-    this.travelReview.setTitle(text);
+    this.title = text;
   }
 
   void onReviewChange(String text) {
-    this.travelReview.setReview(text);
+    this.review = text;
   }
 
   void onRatingChange(double rating) {
-    this.travelReview.setRating(rating);
+    this.rating = rating;
   }
 
   void setDefaultState() {
-    this.placeRepository = PlaceRepository();
-    this.travelReviewRepository = TravelReviewRepository();
-    this.travelReviewImageRepository = TravelReviewImageRepository();
-    this.travelReview = TravelReview.defaultReview();
     this.searchText = "";
+    this.title = "";
+    this.review = "";
+    this.rating = 2.5;
     this.selectedPlace = null;
     this.imagePath = null;
     this.searchPlaceList = [];
@@ -77,9 +87,19 @@ class MapSearchViewModel extends Subject with ChangeNotifier {
   }
 
   Future<void> onSubmitReviewPress() async {
+    TravelReview reviewToCreate = TravelReview(
+      title: this.title,
+      review: this.review,
+      rating: this.rating,
+      type: this.type,
+      date: DateTime.now(),
+      place: this.selectedPlace,
+    );
+
     try {
-      TravelReview review =
-          await this.travelReviewRepository.create(this.travelReview);
+      TravelReview review = await this
+          .travelReviewRepository
+          .createById(reviewToCreate, this.user.userId);
 
       if (this.imagePath != null) {
         review.addImage(

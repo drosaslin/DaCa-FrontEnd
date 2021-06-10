@@ -18,6 +18,10 @@ class DaCaStrings {
   static final friendChip = 'friend';
   static final allChip = 'all';
 
+  static final foodReview = 'Food';
+  static final travelReview = 'Travel';
+  static final lifeReview = 'Life';
+
   static final tabMapText = 'My Map';
 
   static final searchHint = 'Search...';

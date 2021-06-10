@@ -1,13 +1,12 @@
+import 'package:daca/models/user.dart';
 import 'package:daca/public/colors.dart';
-import 'package:daca/viewmodels/map_search_view_model.dart';
+import 'package:daca/public/strings.dart';
 import 'package:daca/viewmodels/tab_navigator_view_model.dart';
-import 'package:daca/viewmodels/map_view_model.dart';
 import 'package:daca/views/account.dart';
-import 'package:daca/views/map_search_view.dart';
+import 'package:daca/views/place_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:daca/views/customwidgets/ColoredSafeArea.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import 'book_movie_collecction.dart';
 import 'homepage.dart';
@@ -15,11 +14,14 @@ import 'map_view.dart';
 
 class TabNavigatorView extends StatelessWidget {
   static String tag = 'tabNavigatorView';
+  final User user;
+
+  TabNavigatorView({@required this.user});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<TabNavigatorViewModel>(
-      create: (context) => TabNavigatorViewModel(),
+      create: (context) => TabNavigatorViewModel(this.user),
       child: TabController(),
     );
   }
@@ -30,21 +32,23 @@ class TabController extends StatefulWidget {
   _TabControllerState createState() => _TabControllerState();
 }
 
-class _TabControllerState extends State<TabController> {
+class _TabControllerState extends State<TabController>
+    with TickerProviderStateMixin {
   int selectedPageIndex;
   List<Widget> pages;
   PageController pageController;
-  final MapViewModel mapViewModel = MapViewModel();
-  final MapSearchViewModel mapSearchViewModel = MapSearchViewModel();
 
   @override
   void initState() {
     super.initState();
 
+    final viewModel =
+        Provider.of<TabNavigatorViewModel>(context, listen: false);
+
     selectedPageIndex = 0;
     pages = [
       HomePage(),
-      MapView(mapViewModel),
+      MapView(viewModel.mapViewModel),
       Collection(),
       Account(),
     ];
@@ -64,89 +68,104 @@ class _TabControllerState extends State<TabController> {
       final viewModel =
           Provider.of<TabNavigatorViewModel>(context, listen: false);
       selectedPageIndex = viewModel.selectedIndex;
+      viewModel.onOutsidePress();
       pageController.jumpToPage(selectedPageIndex);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<TabNavigatorViewModel>(context, listen: true);
+
     return ColoredSafeArea(
       color: DaCaColors.primaryColor,
-      child: Scaffold(
-        body: PageView(
-          controller: pageController,
-          physics: NeverScrollableScrollPhysics(),
-          children: pages,
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          backgroundColor: DaCaColors.primaryColor,
-          onPressed: () => {
-            this.mapSearchViewModel.clearObservers(),
-            this.mapSearchViewModel.registerObserver(this.mapViewModel),
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChangeNotifierProvider.value(
-                    value: this.mapSearchViewModel,
-                    child: MapSearchView(),
-                  ),
-                )),
-          },
-        ),
-        bottomNavigationBar:
-            TabItemsWidget(onTabChangeCallback: this.onTapChange),
-      ),
-    );
-  }
-}
-
-class CustomFAB extends StatefulWidget {
-  @override
-  _CustomFABState createState() => _CustomFABState();
-}
-
-class _CustomFABState extends State<CustomFAB> with TickerProviderStateMixin {
-  @override
-  Widget build(BuildContext context) {
-    return SpeedDial(
-      animatedIcon: AnimatedIcons.menu_close,
-      animatedIconTheme: IconThemeData(size: 22.0),
-      // child: Icon(Icons.add),
-      onOpen: () => print('OPENING DIAL'),
-      onClose: () => print('DIAL CLOSED'),
-      visible: true,
-      curve: Curves.bounceIn,
-      children: [
-        SpeedDialChild(
-          child: Icon(Icons.accessibility, color: Colors.white),
-          backgroundColor: Colors.deepOrange,
-          onTap: () => print('FIRST CHILD'),
-          label: 'First Child',
-          labelStyle: TextStyle(fontWeight: FontWeight.w500),
-          labelBackgroundColor: Colors.deepOrangeAccent,
-        ),
-        SpeedDialChild(
-          child: Icon(Icons.brush, color: Colors.white),
-          backgroundColor: Colors.green,
-          onTap: () => print('SECOND CHILD'),
-          label: 'Second Child',
-          labelStyle: TextStyle(fontWeight: FontWeight.w500),
-          labelBackgroundColor: Colors.green,
-        ),
-        SpeedDialChild(
-          child: Icon(Icons.keyboard_voice, color: Colors.white),
-          backgroundColor: Colors.blue,
-          onTap: () => print('THIRD CHILD'),
-          labelWidget: Container(
-            color: Colors.blue,
-            margin: EdgeInsets.only(right: 10),
-            padding: EdgeInsets.all(6),
-            child: Text('Custom Label Widget'),
+      child: Stack(
+        children: [
+          Scaffold(
+            body: PageView(
+              controller: pageController,
+              physics: NeverScrollableScrollPhysics(),
+              children: pages,
+            ),
+            bottomNavigationBar:
+                TabItemsWidget(onTabChangeCallback: this.onTapChange),
           ),
-        ),
-      ],
+          Visibility(
+            visible: viewModel.isTypeSelectionOpen(),
+            child: GestureDetector(
+              onTap: () => viewModel.onOutsidePress(),
+              child: Container(
+                color: DaCaColors.dacaGrey,
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height - 88,
+              ),
+            ),
+          ),
+          Positioned.fill(
+            bottom: 66,
+            child: Visibility(
+              visible: viewModel.animationEnd,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: PhysicalModel(
+                  color: Colors.amber,
+                  shadowColor: Colors.amber,
+                  elevation: 8,
+                  child: Container(
+                    width: viewModel.expandableFabWidth > 50
+                        ? viewModel.expandableFabWidth - 50
+                        : 0,
+                    height: 1,
+                    color: Colors.transparent,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            bottom: 40,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOutQuart,
+                width: viewModel.expandableFabWidth,
+                height: viewModel.expandableFabHeight,
+                child: CustomButtonShape(),
+                onEnd: () => viewModel.onAnimationEnd(),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            bottom: 12,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: GestureDetector(
+                onTap: () => viewModel.onAnimationStart(),
+                child: PhysicalModel(
+                  color: Colors.amber,
+                  shadowColor: Colors.amber,
+                  elevation: 8,
+                  shape: BoxShape.circle,
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: DaCaColors.primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
@@ -209,4 +228,142 @@ class TabItemsWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class CustomButtonShape extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: ClipPath(
+        child: PhysicalModel(
+          color: Colors.black,
+          elevation: 8.0,
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: DaCaColors.primaryColor,
+            child: Padding(
+              padding: EdgeInsets.only(left: 22, right: 22, top: 5, bottom: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ExpandableFabButton(
+                      text: DaCaStrings.travelReview,
+                      icon: Icons.map_outlined,
+                    ),
+                  ),
+                  Expanded(
+                    child: ExpandableFabButton(
+                      text: DaCaStrings.foodReview,
+                      icon: Icons.restaurant_menu_outlined,
+                    ),
+                  ),
+                  Expanded(
+                    child: ExpandableFabButton(
+                      text: DaCaStrings.lifeReview,
+                      icon: Icons.family_restroom_outlined,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        clipper: CustomShape(),
+      ),
+    );
+  }
+}
+
+class ExpandableFabButton extends StatelessWidget {
+  final String text;
+  final IconData icon;
+
+  ExpandableFabButton({@required this.text, @required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel =
+        Provider.of<TabNavigatorViewModel>(context, listen: false);
+
+    return InkWell(
+      onTap: () => {
+        viewModel.onReviewTypePress(this.text),
+        viewModel.onOutsidePress(),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChangeNotifierProvider.value(
+              value: viewModel.placeSearchViewModel,
+              child: PlaceSearchView(),
+            ),
+          ),
+        ),
+      },
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(
+              this.text,
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Icon(
+              this.icon,
+              color: Colors.white,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class CustomShape extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    double width = size.width;
+    double height = size.height;
+    double box = 50;
+    double halfBox = box / 2;
+    double restPoint = height * 180 / 200;
+    double anglePoint = (width / 2 - halfBox);
+    double curve = width * 30 / 200;
+
+    path.moveTo(0, height * 3 / 4);
+    path.lineTo(0, height * 3 / 4);
+
+    path.quadraticBezierTo(0, restPoint, curve, restPoint);
+
+    path.lineTo(anglePoint - curve, restPoint);
+    path.quadraticBezierTo(anglePoint, restPoint, anglePoint, height);
+
+    path.lineTo(anglePoint, height);
+    path.lineTo(anglePoint + box, height);
+    path.quadraticBezierTo(
+        anglePoint + box, restPoint, anglePoint + box + curve, restPoint);
+    path.lineTo(width - curve, restPoint);
+
+    path.quadraticBezierTo(width, restPoint, width, restPoint - curve);
+    path.lineTo(width, curve);
+
+    path.quadraticBezierTo(width, 0, width - curve, 0);
+
+    path.lineTo(curve, 0);
+
+    path.quadraticBezierTo(0, 0, 0, curve);
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

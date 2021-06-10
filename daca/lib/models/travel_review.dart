@@ -1,10 +1,12 @@
 import 'package:daca/models/place.dart';
 import 'package:daca/models/travel_review_image.dart';
+import 'package:daca/public/variables.dart';
 
 class TravelReview {
   int id;
   String title;
   String review;
+  String type;
   double rating;
   DateTime date;
   Place place;
@@ -14,27 +16,20 @@ class TravelReview {
     this.id,
     this.title,
     this.review,
+    this.type,
     this.place,
     this.rating,
     this.date,
     this.images,
   });
 
-  TravelReview.defaultReview() {
-    this.id = null;
-    this.title = "";
-    this.review = "";
-    this.place = null;
-    this.rating = 2.5;
-    this.images = [];
-    this.date = DateTime.now();
-  }
-
   int getId() => this.id;
 
   String getTitle() => this.title;
 
   String getReview() => this.review;
+
+  String getType() => this.type;
 
   Place getPlace() => this.place;
 
@@ -48,6 +43,8 @@ class TravelReview {
 
   void setReview(String review) => this.review = review;
 
+  void setType(String type) => this.type = type;
+
   void setPlace(Place place) => this.place = place;
 
   void setRating(double rating) => this.rating = rating;
@@ -56,13 +53,14 @@ class TravelReview {
 
   factory TravelReview.fromJson(final json) {
     return TravelReview(
-      id: json['id'],
-      place: Place.fromJson(json['place_details']),
-      title: json['title'],
-      review: json['review'],
-      rating: json['rating'],
-      date: DateTime.parse(json['date']),
-      images: (json['images'] as List)
+      id: json[DaCaVariables.reviewIdField],
+      place: Place.fromJson(json[DaCaVariables.reviewPlaceDetailsField]),
+      title: json[DaCaVariables.reviewTitleField],
+      review: json[DaCaVariables.reviewReviewField],
+      type: json[DaCaVariables.reviewTypeField],
+      rating: json[DaCaVariables.reviewRatingField],
+      date: DateTime.parse(json[DaCaVariables.reviewDateField]),
+      images: (json[DaCaVariables.reviewImagesField] as List)
           .map((i) => TravelReviewImage.fromJson(i))
           .toList(),
     );
@@ -70,11 +68,12 @@ class TravelReview {
 
   Map<String, dynamic> toJson() {
     return {
-      'place_id': this.place.placeId,
-      'title': this.title,
-      'review': this.review,
-      'rating': this.rating.toString(),
-      'date': this.date.toString(),
+      DaCaVariables.reviewPlaceIdField: this.place.placeId,
+      DaCaVariables.reviewTitleField: this.title,
+      DaCaVariables.reviewReviewField: this.review,
+      DaCaVariables.reviewTypeField: this.type,
+      DaCaVariables.reviewRatingField: this.rating.toString(),
+      DaCaVariables.reviewDateField: this.date.toString(),
     };
   }
 }

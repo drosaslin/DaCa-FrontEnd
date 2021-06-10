@@ -2,24 +2,25 @@ import 'dart:io';
 
 import 'package:daca/public/colors.dart';
 import 'package:daca/public/strings.dart';
-import 'package:daca/viewmodels/map_search_view_model.dart';
+import 'package:daca/viewmodels/place_search_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-class MapSearchView extends StatelessWidget {
+class PlaceSearchView extends StatelessWidget {
   static String tag = 'mapSearchView';
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<PlaceSearchViewModel>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Where to?'),
+        title: Text(viewModel.type),
         backgroundColor: DaCaColors.primaryColor,
       ),
       body: CustomSearchbar(),
-      // ),
     );
   }
 }
@@ -33,7 +34,7 @@ class CustomSearchbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<MapSearchViewModel>(context);
+    final viewModel = Provider.of<PlaceSearchViewModel>(context);
 
     return FloatingSearchBar(
       hint: DaCaStrings.searchHint,
@@ -72,7 +73,7 @@ class SearchResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<MapSearchViewModel>(context);
+    final viewModel = Provider.of<PlaceSearchViewModel>(context);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
@@ -110,12 +111,12 @@ class SearchResults extends StatelessWidget {
                     subtitle: Text(place.formattedAddress),
                     onTap: () => {
                       this.onPlaceTapCallback(),
-                      viewModel.setSelectedPlace(place),
+                      viewModel.onPlaceSelected(place),
                       showDialog(
                         context: context,
                         builder: (_) {
                           return ChangeNotifierProvider<
-                              MapSearchViewModel>.value(
+                              PlaceSearchViewModel>.value(
                             value: viewModel,
                             child: AddReviewDialog(),
                           );
@@ -143,7 +144,7 @@ class SearchResults extends StatelessWidget {
 class AddReviewDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<MapSearchViewModel>(context);
+    final viewModel = Provider.of<PlaceSearchViewModel>(context);
 
     return AlertDialog(
       scrollable: true,
@@ -153,7 +154,7 @@ class AddReviewDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextFormField(
-              initialValue: viewModel.travelReview.title,
+              initialValue: viewModel.title,
               autofocus: true,
               decoration: InputDecoration(
                 labelText: 'Title',
@@ -166,7 +167,7 @@ class AddReviewDialog extends StatelessWidget {
               title: Text('Rating'),
               subtitle: RatingBar.builder(
                 glow: false,
-                initialRating: viewModel.travelReview.rating,
+                initialRating: viewModel.rating,
                 minRating: 0.5,
                 direction: Axis.horizontal,
                 allowHalfRating: true,
