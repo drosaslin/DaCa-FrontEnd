@@ -3,6 +3,10 @@ import 'package:daca/models/travel_review_image.dart';
 import 'package:daca/public/variables.dart';
 
 class TravelReview {
+  static String FOOD_TYPE = DaCaVariables.foodType;
+  static String TRAVEL_TYPE = DaCaVariables.travelType;
+  static String LIFE_TYPE = DaCaVariables.lifeType;
+
   int id;
   String title;
   String review;

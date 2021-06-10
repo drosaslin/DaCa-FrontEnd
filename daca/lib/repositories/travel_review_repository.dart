@@ -20,6 +20,8 @@ class TravelReviewRepository implements IRepository<TravelReview> {
     var body = review.toJson();
     body[DaCaVariables.userIdField] = userId;
 
+    print(jsonEncode(body));
+
     final response = await http.post(this.travelUrl,
         body: json.encode(body), headers: this.headers);
 

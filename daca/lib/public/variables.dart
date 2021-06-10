@@ -47,4 +47,9 @@ class DaCaVariables {
   static const postMethod = 'POST';
   static const getMethod = 'GET';
   static const imageMediaType = 'image';
+
+  // Travel Review Types
+  static const foodType = 'food';
+  static const travelType = 'travel';
+  static const lifeType = 'life';
 }

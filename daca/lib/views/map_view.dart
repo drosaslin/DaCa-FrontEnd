@@ -69,12 +69,12 @@ class OptionChipsWidget extends StatelessWidget {
               selected: viewModel.lifeChipState,
               onSelected: (_) => viewModel.onLifeChipPress(),
             ),
-            FilterChip(
-              label: Text(DaCaStrings.friendChip),
-              selectedColor: DaCaColors.primaryColor,
-              selected: viewModel.friendChipState,
-              onSelected: (_) => viewModel.onFriendChipPress(),
-            ),
+            // FilterChip(
+            // label: Text(DaCaStrings.friendChip),
+            // selectedColor: DaCaColors.primaryColor,
+            // selected: viewModel.friendChipState,
+            // onSelected: (_) => viewModel.onFriendChipPress(),
+            // ),
             FilterChip(
               label: Text(DaCaStrings.allChip),
               selectedColor: DaCaColors.primaryColor,
@@ -123,36 +123,36 @@ class _MapWidgetState extends State<MapWidget> {
     viewModel.setOnCurrentPositionChange(this.onCurrentPositionChange);
 
     return GoogleMap(
-      onMapCreated: (GoogleMapController controller) => {
+      onMapCreated: (GoogleMapController controller) async => {
         this.mapController = controller,
 
         /**
          ** Fetching the user's current position and 
          ** list of reviews after the map is created
          */
-        viewModel.onMapCreated(),
+        await viewModel.onMapCreated(),
       },
       initialCameraPosition: CameraPosition(
         target: LatLng(0, 0),
       ),
       markers: Set<Marker>.of(
-        viewModel.travelReviewList.map(
-          (review) => Marker(
-            markerId: MarkerId(review.place.placeId),
-            position: LatLng(
-              review.place.geometry.location.lat,
-              review.place.geometry.location.lng,
-            ),
-            infoWindow: InfoWindow(
-              title: review.title,
-              snippet: review.review,
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => ReviewInfoDialog(travelReview: review),
+        viewModel.getReviewList().map(
+              (review) => Marker(
+                markerId: MarkerId(review.place.placeId),
+                position: LatLng(
+                  review.place.geometry.location.lat,
+                  review.place.geometry.location.lng,
+                ),
+                infoWindow: InfoWindow(
+                  title: review.title,
+                  snippet: review.review,
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (_) => ReviewInfoDialog(travelReview: review),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
       ),
       myLocationEnabled: this.myLocationEnabled,
       myLocationButtonEnabled: this.myLocationbuttonEnabled,

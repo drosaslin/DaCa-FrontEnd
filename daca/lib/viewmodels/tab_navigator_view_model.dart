@@ -34,11 +34,8 @@ class TabNavigatorViewModel with ChangeNotifier {
     this.accountIconColor = this.unselectedColor;
     this.user = user;
 
-    print(0);
-    print(this.user);
-
-    this.mapViewModel = MapViewModel(user: this.user);
-    this.placeSearchViewModel = PlaceSearchViewModel(user: this.user);
+    this.mapViewModel = MapViewModel(this.user);
+    this.placeSearchViewModel = PlaceSearchViewModel(this.user);
   }
 
   void onMagazineIconPress() {
@@ -80,6 +77,7 @@ class TabNavigatorViewModel with ChangeNotifier {
     this.placeSearchViewModel.clearObservers();
     this.placeSearchViewModel.registerObserver(this.mapViewModel);
     this.placeSearchViewModel.type = type.toLowerCase();
+    print(this.placeSearchViewModel.type);
   }
 
   void onOutsidePress() {

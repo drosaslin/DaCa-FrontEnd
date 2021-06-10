@@ -20,23 +20,29 @@ class MapViewModel extends Observer with ChangeNotifier {
       TravelReviewRepository();
   final double zoomAmount = 13.0;
 
+  TravelReview selectedReview = null;
+  List<TravelReview> travelReviewList = [];
+  Set<Marker> markers = {};
+  Position currentPosition;
+  User user;
+
+  Set<String> selectedReviewTypeList = {};
   bool isDisposed = false;
   bool foodChipState = true;
   bool travelChipState = true;
   bool lifeChipState = true;
   bool friendChipState = true;
-  bool allChipState = true;
-  TravelReview selectedReview = null;
-  Set<Marker> markers = {};
-  List<TravelReview> travelReviewList = [];
-  Position currentPosition;
-  User user;
+
+  /* *
+   * All chip state will become true after the constructor runs
+   * since the onAllChipPress function reverses its value
+   */
+  bool allChipState = false;
 
   Function onCurrentPositionChangeCallback;
   Function onInfoWindowPressCallback;
 
-  MapViewModel({@required this.user}) {
-    this.allChipState = true;
+  MapViewModel(this.user) {
     this.onAllChipPress();
   }
 
@@ -46,41 +52,50 @@ class MapViewModel extends Observer with ChangeNotifier {
   void setOnInfoWindowPress(Function callback) =>
       this.onInfoWindowPressCallback = callback;
 
-  void setSelectedReview(TravelReview review) {
-    this.selectedReview = review;
-  }
+  void setSelectedReview(TravelReview review) => this.selectedReview = review;
 
-  void onMapCreated() {
-    this.getCurrentPosition();
-    this.getReviews();
+  List<TravelReview> getReviewList() => this
+      .travelReviewList
+      .where((review) => this.selectedReviewTypeList.contains(review.type))
+      .toList();
+
+  void onMapCreated() async {
+    await this.fetchCurrentPosition();
+    await this.fetchReviews();
 
     notifyListeners();
   }
 
   void onFoodChipPress() {
     this.foodChipState = !this.foodChipState;
-    onChipStateChange();
+    this.updateSelectedReviewTypeList(
+        this.foodChipState, TravelReview.FOOD_TYPE);
+    this.onChipStateChange();
   }
 
   void onTravelChipPress() {
     this.travelChipState = !this.travelChipState;
-    onChipStateChange();
+    this.updateSelectedReviewTypeList(
+        this.travelChipState, TravelReview.TRAVEL_TYPE);
+    this.onChipStateChange();
   }
 
   void onLifeChipPress() {
     this.lifeChipState = !this.lifeChipState;
-    onChipStateChange();
+    this.updateSelectedReviewTypeList(
+        this.lifeChipState, TravelReview.LIFE_TYPE);
+    this.onChipStateChange();
   }
 
   void onFriendChipPress() {
     this.friendChipState = !this.friendChipState;
-    onChipStateChange();
+    this.onChipStateChange();
   }
 
   void onAllChipPress() {
     this.allChipState = !this.allChipState;
-    setChipStates(this.allChipState);
-    onChipStateChange();
+    this.setChipStates();
+    this.onChipStateChange();
   }
 
   /* *
@@ -96,37 +111,47 @@ class MapViewModel extends Observer with ChangeNotifier {
     notifyListeners();
   }
 
-  void setChipStates(bool state) {
-    this.foodChipState = state;
-    this.travelChipState = state;
-    this.lifeChipState = state;
-    this.friendChipState = state;
+  void setChipStates() {
+    this.foodChipState = this.allChipState;
+    this.travelChipState = this.allChipState;
+    this.lifeChipState = this.allChipState;
+    this.friendChipState = this.allChipState;
   }
 
-  Future<void> getReviews() async {
+  void updateSelectedReviewTypeList(bool isActive, String reviewType) {
+    if (isActive) {
+      this.selectedReviewTypeList.add(reviewType);
+    } else {
+      this.selectedReviewTypeList.remove(reviewType);
+    }
+  }
+
+  Future<void> fetchReviews() async {
     this.travelReviewList =
         await this.travelReviewRepository.getListById(this.user.userId);
   }
 
-  Future<void> getCurrentPosition() async {
+  Future<void> fetchCurrentPosition() async {
     await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-        .then((value) => {
-              this.currentPosition = value,
-              this.onCurrentPositionChangeCallback(this.currentPosition),
-            })
-        .catchError((err) => {
-              print(err),
-              Fluttertoast.showToast(
-                  msg: DaCaStrings.retrieveCurrentPositionError),
-            });
+        .then(
+          (value) => {
+            this.currentPosition = value,
+            this.onCurrentPositionChangeCallback(this.currentPosition),
+          },
+        )
+        .catchError(
+          (err) => {
+            print(err),
+            Fluttertoast.showToast(
+                msg: DaCaStrings.retrieveCurrentPositionError),
+          },
+        );
   }
 
   @override
   void update([review]) {
-    print('updating...');
     this.travelReviewList.add(review);
-
     notifyListeners();
   }
 

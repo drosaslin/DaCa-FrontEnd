@@ -30,11 +30,9 @@ class PlaceSearchViewModel extends Subject with ChangeNotifier {
   String searchText;
   String imagePath;
 
-  PlaceSearchViewModel({@required this.user}) {
+  PlaceSearchViewModel(this.user) {
     this.setDefaultState();
     this.user = user;
-    print(1);
-    print(this.user);
   }
 
   void onPlaceSelected(Place place) {
