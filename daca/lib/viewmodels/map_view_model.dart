@@ -29,17 +29,14 @@ class MapViewModel extends Observer with ChangeNotifier {
   TravelReview selectedReview = null;
   Set<Marker> markers = {};
   List<TravelReview> travelReviewList = [];
-<<<<<<< HEAD
 
   /**
    * * Positions for custom stacked info window widget
    */
   double infoWindowTop = 0;
   double infoWindowLeft = 0;
-=======
   Position currentPosition;
   User user;
->>>>>>> main
 
   Function onCurrentPositionChangeCallback;
   Function onInfoWindowPressCallback;
@@ -106,9 +103,13 @@ class MapViewModel extends Observer with ChangeNotifier {
     notifyListeners();
   }
 
-  void onMapPositionChange(double x, double y, devicePixelRatio) {
-    this.infoWindowLeft = (x / devicePixelRatio) - (100 / 2);
-    this.infoWindowTop = ((y / devicePixelRatio) - (100 / 2)) - 120;
+  /* *
+   * Calculating the position of which the modal should be 
+   * placed based on the map movements
+   */
+  Future<void> onMapPositionChange(double x, double y, devicePixelRatio) async {
+    this.infoWindowLeft = await (x / devicePixelRatio) - (100 / 2);
+    this.infoWindowTop = await ((y / devicePixelRatio) - (100 / 2)) - 120;
 
     print('$infoWindowLeft, $infoWindowTop');
 

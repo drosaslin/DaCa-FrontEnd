@@ -228,7 +228,7 @@ class _MapWidgetState extends State<MapWidget> {
                 ),
               );
 
-          viewModel.onMapPositionChange(
+          await viewModel.onMapPositionChange(
             coordinates.x.toDouble(),
             coordinates.y.toDouble(),
             MediaQuery.of(context).devicePixelRatio,
