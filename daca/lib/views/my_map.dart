@@ -5,17 +5,18 @@ class MyMap extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add_location_alt_outlined),
           elevation: 10,
           backgroundColor: Colors.amber,
           onPressed: () {
             print('press...');
           }),
-      body: Column(children: <Widget>[
-        Center(child: Text('My Map')),
-
-         ]),
+      body: Column(
+        children: <Widget>[
+          Center(child: Text('My Map')),
+        ],
+      ),
     );
   }
 }

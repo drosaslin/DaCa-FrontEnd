@@ -107,7 +107,8 @@ class MapViewModel extends Observer with ChangeNotifier {
    * Calculating the position of which the modal should be 
    * placed based on the map movements
    */
-  Future<void> onMapPositionChange(double x, double y, devicePixelRatio) async {
+  Future<void> onMapPositionChange(
+      double x, double y, double devicePixelRatio) async {
     this.infoWindowLeft = await (x / devicePixelRatio) - (100 / 2);
     this.infoWindowTop = await ((y / devicePixelRatio) - (100 / 2)) - 120;
 
