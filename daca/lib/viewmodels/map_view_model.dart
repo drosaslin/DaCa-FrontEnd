@@ -33,17 +33,16 @@ class MapViewModel extends Observer with ChangeNotifier {
   bool lifeChipState = true;
   bool friendChipState = true;
 
-  /* *
-   * All chip state will become true after the constructor runs
-   * since the onAllChipPress function reverses its value
-   */
-  bool allChipState = false;
-
   Function onCurrentPositionChangeCallback;
   Function onInfoWindowPressCallback;
 
   MapViewModel(this.user) {
-    this.onAllChipPress();
+    this.updateSelectedReviewTypeList(
+        this.foodChipState, TravelReview.FOOD_TYPE);
+    this.updateSelectedReviewTypeList(
+        this.travelChipState, TravelReview.TRAVEL_TYPE);
+    this.updateSelectedReviewTypeList(
+        this.lifeChipState, TravelReview.LIFE_TYPE);
   }
 
   void setOnCurrentPositionChange(Function callback) =>
@@ -70,52 +69,21 @@ class MapViewModel extends Observer with ChangeNotifier {
     this.foodChipState = !this.foodChipState;
     this.updateSelectedReviewTypeList(
         this.foodChipState, TravelReview.FOOD_TYPE);
-    this.onChipStateChange();
+    notifyListeners();
   }
 
   void onTravelChipPress() {
     this.travelChipState = !this.travelChipState;
     this.updateSelectedReviewTypeList(
         this.travelChipState, TravelReview.TRAVEL_TYPE);
-    this.onChipStateChange();
+    notifyListeners();
   }
 
   void onLifeChipPress() {
     this.lifeChipState = !this.lifeChipState;
     this.updateSelectedReviewTypeList(
         this.lifeChipState, TravelReview.LIFE_TYPE);
-    this.onChipStateChange();
-  }
-
-  void onFriendChipPress() {
-    this.friendChipState = !this.friendChipState;
-    this.onChipStateChange();
-  }
-
-  void onAllChipPress() {
-    this.allChipState = !this.allChipState;
-    this.setChipStates();
-    this.onChipStateChange();
-  }
-
-  /* *
-   * Setting the state of the allChipState to false if 
-   * at least one chip is false and updating the view
-  */
-  void onChipStateChange() {
-    this.allChipState = (this.foodChipState &&
-        this.travelChipState &&
-        this.lifeChipState &&
-        this.friendChipState);
-
     notifyListeners();
-  }
-
-  void setChipStates() {
-    this.foodChipState = this.allChipState;
-    this.travelChipState = this.allChipState;
-    this.lifeChipState = this.allChipState;
-    this.friendChipState = this.allChipState;
   }
 
   void updateSelectedReviewTypeList(bool isActive, String reviewType) {
@@ -142,7 +110,6 @@ class MapViewModel extends Observer with ChangeNotifier {
         )
         .catchError(
           (err) => {
-            print(err),
             Fluttertoast.showToast(
                 msg: DaCaStrings.retrieveCurrentPositionError),
           },
